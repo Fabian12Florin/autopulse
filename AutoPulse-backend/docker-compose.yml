@@ -1,0 +1,550 @@
+x-tiny-service-limits: &tiny-service-limits
+  mem_limit: 256m
+  cpus: "0.25"
+
+x-small-service-limits: &small-service-limits
+  mem_limit: 384m
+  cpus: "0.35"
+
+x-medium-service-limits: &medium-service-limits
+  mem_limit: 512m
+  cpus: "0.50"
+
+x-heavy-service-limits: &heavy-service-limits
+  mem_limit: 768m
+  cpus: "0.75"
+
+x-tool-service-limits: &tool-service-limits
+  mem_limit: 1536m
+  cpus: "1.25"
+
+services:
+  keycloak:
+    <<: *medium-service-limits
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: autopulse-keycloak
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:?KEYCLOAK_ADMIN_USERNAME_required}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD_required}
+      KC_HEALTH_ENABLED: "true"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://${KEYCLOAK_DB_HOST}:${KEYCLOAK_DB_PORT}/${KEYCLOAK_DB_NAME}?sslmode=require&currentSchema=${KEYCLOAK_DB_SCHEMA}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USERNAME:?KEYCLOAK_DB_USERNAME_required}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD_required}
+    ports:
+      - "${KEYCLOAK_PORT}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/localhost/9000' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 40s
+    networks:
+      - autopulse-network
+
+  kafka:
+    <<: *medium-service-limits
+    image: apache/kafka:3.7.2
+    container_name: autopulse-kafka
+    environment:
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:?KAFKA_CLUSTER_ID_required}
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:${KAFKA_EXTERNAL_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    ports:
+      - "${KAFKA_EXTERNAL_PORT}:9094"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - autopulse-network
+
+  kafka-ui:
+    <<: *small-service-limits
+    image: provectuslabs/kafka-ui:latest
+    container_name: autopulse-kafka-ui
+    ports:
+      - "9100:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: autopulse-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - autopulse-network
+
+  discovery-service:
+    <<: *tiny-service-limits
+    build:
+      context: .
+      dockerfile: discovery-service/Dockerfile
+    container_name: autopulse-discovery-service
+    environment:
+      PORT: ${DISCOVERY_PORT}
+      EUREKA_HOSTNAME: discovery-service
+      EUREKA_URL: http://discovery-service:8761/eureka
+    ports:
+      - "${DISCOVERY_PORT}:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8761 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    networks:
+      - autopulse-network
+
+  api-gateway:
+    <<: *small-service-limits
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: autopulse-api-gateway
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: gateway-service
+      SPRING_PROFILES_ACTIVE: docker
+      GATEWAY_PORT: ${GATEWAY_PORT}
+      EUREKA_URL: http://discovery-service:8761/eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    ports:
+      - "${GATEWAY_PORT}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 40s
+    networks:
+      - autopulse-network
+
+  fleet-service:
+    <<: *small-service-limits
+    build:
+      context: .
+      dockerfile: fleet-service/Dockerfile
+    container_name: autopulse-fleet-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PORT: ${FLEET_PORT}
+      DB_URL: ${FLEET_DB_URL:?FLEET_DB_URL_required}
+      DB_USERNAME: ${FLEET_DB_USERNAME:?FLEET_DB_USERNAME_required}
+      DB_PASSWORD: ${FLEET_DB_PASSWORD:?FLEET_DB_PASSWORD_required}
+      SPRING_DATASOURCE_URL: ${FLEET_DB_URL:?FLEET_DB_URL_required}
+      SPRING_DATASOURCE_USERNAME: ${FLEET_DB_USERNAME:?FLEET_DB_USERNAME_required}
+      SPRING_DATASOURCE_PASSWORD: ${FLEET_DB_PASSWORD:?FLEET_DB_PASSWORD_required}
+      EUREKA_URL: http://discovery-service:8761/eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    ports:
+      - "${FLEET_PORT}:${FLEET_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:${FLEET_PORT}/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 40s
+    networks:
+      - autopulse-network
+
+  user-service:
+    <<: *medium-service-limits
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: autopulse-user-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: user-service
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: ${USER_PORT}
+
+      DB_HOST: ${USER_DB_HOST:?USER_DB_HOST_required}
+      DB_PORT: ${USER_DB_PORT:?USER_DB_PORT_required}
+      DB_NAME: ${USER_DB_NAME:?USER_DB_NAME_required}
+      DB_SCHEMA: ${USER_DB_SCHEMA:?USER_DB_SCHEMA_required}
+      DB_USERNAME: ${USER_DB_USERNAME:?USER_DB_USERNAME_required}
+      DB_PASSWORD: ${USER_DB_PASSWORD:?USER_DB_PASSWORD_required}
+
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+
+      SPRING_DATASOURCE_URL: ${USER_DB_URL:?USER_DB_URL_required}
+      SPRING_DATASOURCE_USERNAME: ${USER_DB_USERNAME:?USER_DB_USERNAME_required}
+      SPRING_DATASOURCE_PASSWORD: ${USER_DB_PASSWORD:?USER_DB_PASSWORD_required}
+
+      EUREKA_URL: http://discovery-service:8761/eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+      OAUTH2_ISSUER_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM}
+      KEYCLOAK_BASE_URL: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:?KEYCLOAK_REALM_required}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_USER_SERVICE_CLIENT_ID:?KEYCLOAK_USER_SERVICE_CLIENT_ID_required}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_USER_SERVICE_CLIENT_SECRET:?KEYCLOAK_USER_SERVICE_CLIENT_SECRET_required}
+      KEYCLOAK_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:?KEYCLOAK_ADMIN_USERNAME_required}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD_required}
+      KEYCLOAK_ROLE_ADMIN: ${KEYCLOAK_ROLE_ADMIN:?KEYCLOAK_ROLE_ADMIN_required}
+      KEYCLOAK_ROLE_DISPATCHER: ${KEYCLOAK_ROLE_DISPATCHER:?KEYCLOAK_ROLE_DISPATCHER_required}
+      KEYCLOAK_ROLE_COURIER: ${KEYCLOAK_ROLE_COURIER:?KEYCLOAK_ROLE_COURIER_required}
+    ports:
+      - "${USER_PORT}:${USER_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:${USER_PORT}/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 45s
+    networks:
+      - autopulse-network
+
+  geography-service:
+    <<: *medium-service-limits
+    build:
+      context: .
+      dockerfile: geography-service/Dockerfile
+    container_name: autopulse-geography-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: geography-service
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: ${GEOGRAPHY_PORT}
+
+      DB_HOST: ${GEOGRAPHY_DB_HOST:?GEOGRAPHY_DB_HOST_required}
+      DB_PORT: ${GEOGRAPHY_DB_PORT:?GEOGRAPHY_DB_PORT_required}
+      DB_NAME: ${GEOGRAPHY_DB_NAME:?GEOGRAPHY_DB_NAME_required}
+      DB_SCHEMA: ${GEOGRAPHY_DB_SCHEMA:?GEOGRAPHY_DB_SCHEMA_required}
+      DB_USERNAME: ${GEOGRAPHY_DB_USERNAME:?GEOGRAPHY_DB_USERNAME_required}
+      DB_PASSWORD: ${GEOGRAPHY_DB_PASSWORD:?GEOGRAPHY_DB_PASSWORD_required}
+
+      SPRING_DATASOURCE_URL: ${GEOGRAPHY_DB_URL:?GEOGRAPHY_DB_URL_required}
+      SPRING_DATASOURCE_USERNAME: ${GEOGRAPHY_DB_USERNAME:?GEOGRAPHY_DB_USERNAME_required}
+      SPRING_DATASOURCE_PASSWORD: ${GEOGRAPHY_DB_PASSWORD:?GEOGRAPHY_DB_PASSWORD_required}
+
+      EUREKA_URL: http://discovery-service:8761/eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+      OAUTH2_ISSUER_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM}
+    ports:
+      - "${GEOGRAPHY_PORT}:${GEOGRAPHY_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:${GEOGRAPHY_PORT}/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 45s
+    networks:
+      - autopulse-network
+
+  delivery-execution-service:
+    <<: *small-service-limits
+    build:
+      context: .
+      dockerfile: delivery-execution-service/Dockerfile
+    container_name: autopulse-delivery-execution-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: delivery-execution-service
+      SPRING_PROFILES_ACTIVE: docker
+      DELIVERY_SERVER_PORT: ${DELIVERY_SERVER_PORT}
+
+      DELIVERY_DB_HOST: ${DELIVERY_DB_HOST:?DELIVERY_DB_HOST_required}
+      DELIVERY_DB_PORT: ${DELIVERY_DB_PORT:?DELIVERY_DB_PORT_required}
+      DELIVERY_DB_NAME: ${DELIVERY_DB_NAME:?DELIVERY_DB_NAME_required}
+      DELIVERY_DB_SCHEMA: ${DELIVERY_DB_SCHEMA:?DELIVERY_DB_SCHEMA_required}
+      DELIVERY_DB_USER: ${DELIVERY_DB_USER:?DELIVERY_DB_USER_required}
+      DELIVERY_DB_PASSWORD: ${DELIVERY_DB_PASSWORD:?DELIVERY_DB_PASSWORD_required}
+      OAUTH2_ISSUER_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM}
+      EUREKA_URL: http://discovery-service:8761/eureka
+
+      SPRING_DATASOURCE_URL: ${DELIVERY_DB_URL:?DELIVERY_DB_URL_required}
+      SPRING_DATASOURCE_USERNAME: ${DELIVERY_DB_USER:?DELIVERY_DB_USER_required}
+      SPRING_DATASOURCE_PASSWORD: ${DELIVERY_DB_PASSWORD:?DELIVERY_DB_PASSWORD_required}
+
+      EUREKA_CLIENT_ENABLED: "true"
+      SPRING_CLOUD_DISCOVERY_ENABLED: "true"
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "true"
+      EUREKA_CLIENT_FETCH_REGISTRY: "true"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    ports:
+      - "${DELIVERY_SERVER_PORT}:${DELIVERY_SERVER_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:${DELIVERY_SERVER_PORT}/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 45s
+    networks:
+      - autopulse-network
+
+  parcel-service:
+    <<: *small-service-limits
+    build:
+      context: .
+      dockerfile: parcel-service/Dockerfile
+    container_name: autopulse-parcel-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_APPLICATION_NAME: parcel-service
+      PARCEL_SERVER_PORT: ${PARCEL_SERVER_PORT}
+
+      OAUTH2_ISSUER_URI: ${OAUTH2_ISSUER_URI}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${OAUTH2_ISSUER_URI}
+      EUREKA_URL: http://discovery-service:8761/eureka
+      PARCEL_DB_HOST: ${PARCEL_DB_HOST:?PARCEL_DB_HOST_required}
+      PARCEL_DB_PORT: ${PARCEL_DB_PORT:?PARCEL_DB_PORT_required}
+      DB_NAME: ${PARCEL_DB_NAME:?PARCEL_DB_NAME_required}
+      DB_SCHEMA: ${PARCEL_DB_SCHEMA:?PARCEL_DB_SCHEMA_required}
+      PARCEL_DB_USER: ${PARCEL_DB_USER:?PARCEL_DB_USER_required}
+      PARCEL_DB_PASSWORD: ${PARCEL_DB_PASSWORD:?PARCEL_DB_PASSWORD_required}
+
+      SPRING_DATASOURCE_URL: ${PARCEL_DB_URL:?PARCEL_DB_URL_required}
+      SPRING_DATASOURCE_USERNAME: ${PARCEL_DB_USER:?PARCEL_DB_USER_required}
+      SPRING_DATASOURCE_PASSWORD: ${PARCEL_DB_PASSWORD:?PARCEL_DB_PASSWORD_required}
+
+      EUREKA_CLIENT_ENABLED: "true"
+      SPRING_CLOUD_DISCOVERY_ENABLED: "true"
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "true"
+      EUREKA_CLIENT_FETCH_REGISTRY: "true"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    ports:
+      - "${PARCEL_SERVER_PORT}:${PARCEL_SERVER_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:${PARCEL_SERVER_PORT}/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 45s
+    networks:
+      - autopulse-network
+
+  routing-service:
+    <<: *small-service-limits
+    build:
+      context: .
+      dockerfile: routing-service/Dockerfile
+    container_name: autopulse-routing-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      delivery-execution-service:
+        condition: service_healthy
+      vroom:
+        condition: service_started
+    environment:
+      SPRING_APPLICATION_NAME: routing-service
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: ${ROUTING_SERVER_PORT}
+      ROUTING_SERVER_PORT: ${ROUTING_SERVER_PORT}
+
+      OAUTH2_ISSUER_URI: ${OAUTH2_ISSUER_URI}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${OAUTH2_ISSUER_URI}
+
+      ROUTING_DB_HOST: ${ROUTING_DB_HOST:?ROUTING_DB_HOST_required}
+      ROUTING_DB_PORT: ${ROUTING_DB_PORT:?ROUTING_DB_PORT_required}
+      DB_NAME: ${ROUTING_DB_NAME:?ROUTING_DB_NAME_required}
+      ROUTING_SCHEMA: ${ROUTING_DB_SCHEMA:?ROUTING_DB_SCHEMA_required}
+      ROUTING_USER: ${ROUTING_DB_USER:?ROUTING_DB_USER_required}
+      ROUTING_USER_PASSWORD: ${ROUTING_DB_PASSWORD:?ROUTING_DB_PASSWORD_required}
+
+      SPRING_DATASOURCE_URL: ${ROUTING_DB_URL:?ROUTING_DB_URL_required}
+      SPRING_DATASOURCE_USERNAME: ${ROUTING_DB_USER:?ROUTING_DB_USER_required}
+      SPRING_DATASOURCE_PASSWORD: ${ROUTING_DB_PASSWORD:?ROUTING_DB_PASSWORD_required}
+
+      DELIVERY_EXECUTION_BASE_URL: http://delivery-execution-service:${DELIVERY_SERVER_PORT}
+
+      EUREKA_URL: http://discovery-service:8761/eureka
+      EUREKA_CLIENT_ENABLED: "true"
+      SPRING_CLOUD_DISCOVERY_ENABLED: "true"
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "true"
+      EUREKA_CLIENT_FETCH_REGISTRY: "true"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+      VROOM_BASE_URL: vroom
+      VROOM_BASE_PORT: 3000
+    ports:
+      - "${ROUTING_SERVER_PORT}:${ROUTING_SERVER_PORT}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:${ROUTING_SERVER_PORT}/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 45s
+    networks:
+      - autopulse-network
+
+  notification-service:
+    <<: *small-service-limits
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: autopulse-notification-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: notification-service
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: ${NOTIFICATION_PORT}
+
+      EUREKA_URL: http://discovery-service:8761/eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONSUMER_GROUP: notification-service
+
+      MAIL_HOST: ${MAIL_HOST:?MAIL_HOST_required}
+      MAIL_PORT: ${MAIL_PORT:?MAIL_PORT_required}
+      MAIL_USERNAME: ${MAIL_USERNAME:?MAIL_USERNAME_required}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:?MAIL_PASSWORD_required}
+      MAIL_SMTP_CONNECTION_TIMEOUT: ${MAIL_SMTP_CONNECTION_TIMEOUT:?MAIL_SMTP_CONNECTION_TIMEOUT_required}
+      MAIL_SMTP_TIMEOUT: ${MAIL_SMTP_TIMEOUT:?MAIL_SMTP_TIMEOUT_required}
+      MAIL_SMTP_WRITE_TIMEOUT: ${MAIL_SMTP_WRITE_TIMEOUT:?MAIL_SMTP_WRITE_TIMEOUT_required}
+
+      APP_LOGIN_URL: ${APP_LOGIN_URL:?APP_LOGIN_URL_required}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:?SUPPORT_EMAIL_required}
+    ports:
+      - "${NOTIFICATION_PORT}:${NOTIFICATION_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:${NOTIFICATION_PORT}/actuator/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 45s
+    networks:
+      - autopulse-network
+
+  prometheus:
+    <<: *small-service-limits
+    image: prom/prometheus:latest
+    container_name: autopulse-prometheus
+    depends_on:
+      - api-gateway
+      - fleet-service
+      - user-service
+      - geography-service
+      - parcel-service
+      - delivery-execution-service
+      - routing-service
+      - notification-service
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - autopulse-network
+
+  grafana:
+    <<: *tiny-service-limits
+    image: grafana/grafana:latest
+    container_name: autopulse-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - autopulse-network
+
+  vroom:
+    <<: *medium-service-limits
+    image: ghcr.io/vroom-project/vroom-docker:latest
+    container_name: autopulse-vroom
+    depends_on:
+      - osrm
+    volumes:
+      - ./infra/osrm/vroom-conf/config.yml:/conf/config.yml:ro
+    ports:
+      - "3001:3000"
+    networks:
+      - autopulse-network
+
+  osrm:
+    <<: *heavy-service-limits
+    image: ghcr.io/project-osrm/osrm-backend:v26.5.0-amd64-alpine
+    container_name: autopulse-osrm
+    command: >
+      osrm-routed
+      --algorithm mld
+      --port 5000
+      --ip 0.0.0.0
+      /data/romania-latest.osrm
+    volumes:
+      - ./infra/osrm/osrm-data:/data:ro
+    ports:
+      - "5000:5000"
+    networks:
+      - autopulse-network
+
+  sonarqube:
+    <<: *tool-service-limits
+    image: sonarqube:community
+    container_name: autopulse-sonarqube
+    profiles:
+      - tools
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - autopulse-network
+
+volumes:
+  grafana_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+
+networks:
+  autopulse-network:
+    driver: bridge

@@ -1,0 +1,361 @@
+{
+  "info": {
+    "_postman_id": "0c3c9c0e-8af0-4a79-8c90-0e4f9a0562a6",
+    "name": "Autopulse - Geography Service API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Complete Postman collection for geography-service.\n\nHow to use:\n- Set {{geographyServiceBaseUrl}} to the full base URL of geography-service, including the /api/geography prefix.\n  Example (direct): http://localhost:8085/api/geography\n  Example (gateway): http://localhost:8080/api/geography\n- Set {{accessToken}} to a valid Bearer token (JWT).\n\nAll endpoints in geography-service require authentication (Bearer JWT). DTO payloads match com.autopulse.geographyservice.web.dto.*"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "geographyServiceBaseUrl",
+      "value": "http://localhost:8085/api/geography",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "regionId",
+      "value": "00000000-0000-0000-0000-000000000001",
+      "type": "string"
+    },
+    {
+      "key": "localityId",
+      "value": "00000000-0000-0000-0000-000000000002",
+      "type": "string"
+    },
+    {
+      "key": "regionName",
+      "value": "Bucharest",
+      "type": "string"
+    },
+    {
+      "key": "regionCode",
+      "value": "RO-B",
+      "type": "string"
+    },
+    {
+      "key": "localityName",
+      "value": "Sector 1",
+      "type": "string"
+    },
+    {
+      "key": "localityCode",
+      "value": "RO-B-S1",
+      "type": "string"
+    },
+    {
+      "key": "regionNameFilter",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "regionCodeFilter",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "localityNameFilter",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "localityCodeFilter",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "regionIdFilter",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "localitiesRegionCodeFilter",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "page",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "size",
+      "value": "20",
+      "type": "string"
+    },
+    {
+      "key": "sort",
+      "value": "createdAt,desc",
+      "type": "string"
+    },
+    {
+      "key": "street",
+      "value": "Leandrului 1",
+      "type": "string"
+    },
+    {
+      "key": "city",
+      "value": "Timisoara",
+      "type": "string"
+    },
+    {
+      "key": "county",
+      "value": "Timis",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Geography Management (requires role ADMIN)",
+      "item": [
+        {
+          "name": "Get Region by ID (GET /admin/regions/{regionId})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/admin/regions/{{regionId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Region (POST /admin/regions)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('regionId', json.id);",
+                  "  if (json.code) pm.collectionVariables.set('regionCode', json.code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{regionName}}\",\n  \"code\": \"{{regionCode}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{geographyServiceBaseUrl}}/admin/regions"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Region (PATCH /admin/regions/{regionId})",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{regionName}}\",\n  \"code\": \"{{regionCode}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{geographyServiceBaseUrl}}/admin/regions/{{regionId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Locality by ID (GET /admin/localities/{localityId})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/admin/localities/{{localityId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Locality (POST /admin/localities)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('localityId', json.id);",
+                  "  if (json.code) pm.collectionVariables.set('localityCode', json.code);",
+                  "  if (json.region && json.region.id) pm.collectionVariables.set('regionId', json.region.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{localityName}}\",\n  \"code\": \"{{localityCode}}\",\n  \"regionId\": \"{{regionId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{geographyServiceBaseUrl}}/admin/localities"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Locality (PATCH /admin/localities/{localityId})",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{localityName}}\",\n  \"code\": \"{{localityCode}}\",\n  \"regionId\": \"{{regionId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{geographyServiceBaseUrl}}/admin/localities/{{localityId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Geography Queries (ADMIN/DISPATCHER/COURIER)",
+      "item": [
+        {
+          "name": "Search Regions (GET /query/regions)",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/query/regions?name={{regionNameFilter}}&code={{regionCodeFilter}}&page={{page}}&size={{size}}&sort={{sort}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Region by ID (GET /query/regions/{regionId})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/query/regions/{{regionId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Region by Code (GET /query/regions/by-code/{code})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/query/regions/by-code/{{regionCode}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Localities (GET /query/localities)",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/query/localities?name={{localityNameFilter}}&code={{localityCodeFilter}}&regionId={{regionIdFilter}}&regionCode={{localitiesRegionCodeFilter}}&page={{page}}&size={{size}}&sort={{sort}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Locality by ID (GET /query/localities/{localityId})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/query/localities/{{localityId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Locality by Code (GET /query/localities/by-code/{code})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/query/localities/by-code/{{localityCode}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Coordinates (POST /query/coordinates)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"street\": \"{{street}}\",\n  \"city\": \"{{city}}\",\n  \"county\": \"{{county}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{geographyServiceBaseUrl}}/query/coordinates"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Internal Geography APIs (service-to-service)",
+      "item": [
+        {
+          "name": "Get Region Reference by ID (GET /internal/regions/{regionId})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/internal/regions/{{regionId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Region Reference by Code (GET /internal/regions/by-code/{code})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/internal/regions/by-code/{{regionCode}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Locality Reference by ID (GET /internal/localities/{localityId})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/internal/localities/{{localityId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Locality Reference by Code (GET /internal/localities/by-code/{code})",
+          "request": {
+            "method": "GET",
+            "url": "{{geographyServiceBaseUrl}}/internal/localities/by-code/{{localityCode}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Coordinates (POST /internal/coordinates)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"street\": \"{{street}}\",\n  \"city\": \"{{city}}\",\n  \"county\": \"{{county}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{geographyServiceBaseUrl}}/internal/coordinates"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+

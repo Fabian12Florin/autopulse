@@ -1,0 +1,43 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: api-gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["api-gateway:8080"]
+
+  - job_name: delivery-execution-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["delivery-execution-service:8081"]
+
+  - job_name: parcel-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["parcel-service:8082"]
+
+  - job_name: fleet-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["fleet-service:8083"]
+
+  - job_name: user-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["user-service:8084"]
+
+  - job_name: geography-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["geography-service:8085"]
+
+  - job_name: routing-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["routing-service:8086"]
+
+  - job_name: notification-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["notification-service:8111"]

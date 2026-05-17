@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: osrm
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: osrm
+  template:
+    metadata:
+      labels:
+        app: osrm
+    spec:
+      containers:
+        - name: osrm
+          image: ghcr.io/project-osrm/osrm-backend:v26.5.0-amd64-alpine
+          args:
+            - osrm-routed
+            - --algorithm
+            - mld
+            - --port
+            - "5000"
+            - --ip
+            - 0.0.0.0
+            - /data/romania-latest.osrm
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - name: osrm-data
+              mountPath: /data
+              readOnly: true
+      volumes:
+        - name: osrm-data
+          hostPath:
+            path: /mnt/osrm-data
+            type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: osrm
+  namespace: autopulse
+spec:
+  selector:
+    app: osrm
+  ports:
+    - port: 5000
+      targetPort: 5000

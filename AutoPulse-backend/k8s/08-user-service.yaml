@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: crautopulsedev.azurecr.io/autopulse-user-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: autopulse-config
+          env:
+            - name: SERVER_PORT
+              value: "8084"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: USER_DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: USER_DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: USER_DB_NAME
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: USER_DB_SCHEMA
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: USER_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: USER_DB_PASSWORD
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: USER_DB_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: USER_DB_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: USER_DB_PASSWORD
+            - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: KEYCLOAK_USER_SERVICE_CLIENT_SECRET
+            - name: KEYCLOAK_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: KEYCLOAK_ADMIN_USERNAME
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: KEYCLOAK_ADMIN_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: autopulse
+spec:
+  selector:
+    app: user-service
+  ports:
+    - port: 8084
+      targetPort: 8084

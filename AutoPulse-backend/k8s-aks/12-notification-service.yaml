@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: crautopulsedev.azurecr.io/autopulse-notification-service:1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8111
+          envFrom:
+            - configMapRef:
+                name: autopulse-config
+          env:
+            - name: SERVER_PORT
+              value: "8111"
+            - name: MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: MAIL_USERNAME
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: MAIL_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: autopulse
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - port: 8111
+      targetPort: 8111

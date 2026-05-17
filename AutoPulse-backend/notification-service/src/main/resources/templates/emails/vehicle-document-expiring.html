@@ -1,0 +1,45 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <div style="font-size:22px; font-weight:700; color:#0f172a;">
+        Vehicle document expiring soon
+    </div>
+
+    <div style="margin-top:12px; font-size:14px; color:#334155;">
+        Hello <span th:text="${recipientName}">there</span>,
+    </div>
+
+    <div style="margin-top:12px; font-size:14px; color:#334155;">
+        A vehicle document is close to its expiration date.
+    </div>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+           style="margin-top:18px; background-color:#fff7ed; border:1px solid #fdba74; border-radius:18px;">
+        <tr>
+            <td style="padding:18px; font-family:Arial, sans-serif;">
+                <div style="font-size:14px; color:#0f172a;">
+                    <strong>Document type:</strong> <span th:text="${documentType}">INSURANCE</span>
+                </div>
+
+                <div style="margin-top:8px; font-size:14px; color:#0f172a;">
+                    <strong>Expires at:</strong> <span th:text="${expiresAt}">2026-05-14</span>
+                </div>
+
+                <div style="margin-top:8px; font-size:14px; color:#0f172a;">
+                    <strong>Vehicle ID:</strong> <span th:text="${vehicleId}">vehicle-id</span>
+                </div>
+
+                <div style="margin-top:8px; font-size:14px; color:#0f172a;">
+                    <strong>Document ID:</strong> <span th:text="${documentId}">document-id</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin-top:18px; font-size:13px; color:#475569;">
+        Please review this document and renew it if needed.
+    </div>
+
+    <div style="margin-top:22px; font-size:14px; color:#334155;">
+        Best regards,<br/>
+        AutoPulse Team
+    </div>
+</div>

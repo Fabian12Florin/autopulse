@@ -1,0 +1,35 @@
+package com.autopulse.userservice.web.dto;
+
+import com.autopulse.userservice.model.enums.AvailabilityStatus;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import java.util.UUID;
+
+public record CreateCourierRequest(
+        @NotBlank(message = "Email must not be blank")
+        @Email(message = "Email must be valid")
+        @Size(max = 255, message = "Email must not exceed 255 characters")
+        String email,
+        @NotBlank(message = "First name must not be blank")
+        @Size(min = 2, max = 100, message = "First name must be between 2 and 100 characters")
+        String firstName,
+        @NotBlank(message = "Last name must not be blank")
+        @Size(min = 2, max = 100, message = "Last name must be between 2 and 100 characters")
+        String lastName,
+        @NotBlank(message = "Phone number must not be blank")
+        @Pattern(regexp = "^\\+?[1-9]\\d{7,14}$", message = "Phone number must be in E.164-like format")
+        @Size(max = 20, message = "Phone number must not exceed 20 characters")
+        String phoneNumber,
+        @NotNull(message = "Depot ID must not be null")
+        UUID depotId,
+        @NotBlank(message = "Region code must not be blank")
+        @Size(min = 2, max = 20, message = "Region code must be between 2 and 20 characters")
+        String regionCode,
+        @NotNull(message = "Availability status must not be null")
+        AvailabilityStatus availabilityStatus
+) {
+}

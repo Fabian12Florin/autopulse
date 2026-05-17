@@ -1,0 +1,70 @@
+server:
+  port: ${SERVER_PORT:8085}
+
+spring:
+  application:
+    name: geography-service
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:autopulse}?currentSchema=${DB_SCHEMA:geography_service}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:8008/realms/autopulse}
+
+app:
+  geocoding:
+    nominatim:
+      base-url: ${NOMINATIM_BASE_URL:https://nominatim.openstreetmap.org}
+      user-agent: ${NOMINATIM_USER_AGENT:AutoPulse-Geography-Service/1.0}
+      country-codes: ${NOMINATIM_COUNTRY_CODES:ro}
+      limit: ${NOMINATIM_LIMIT:1}
+      address-details: ${NOMINATIM_ADDRESS_DETAILS:true}
+      minimum-request-interval: ${NOMINATIM_MINIMUM_REQUEST_INTERVAL:1s}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    org.springframework.security: INFO

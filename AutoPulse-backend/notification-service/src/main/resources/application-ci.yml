@@ -1,0 +1,35 @@
+server:
+  port: ${SERVER_PORT:8111}
+
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:notification-service}
+      auto-offset-reset: earliest
+    listener:
+      auto-startup: false
+    admin:
+      auto-create: false
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:test@example.com}
+    password: ${MAIL_PASSWORD:test-password}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          ssl:
+            enable: false
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false

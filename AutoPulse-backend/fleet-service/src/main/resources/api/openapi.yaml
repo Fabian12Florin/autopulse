@@ -1,0 +1,1478 @@
+openapi: 3.0.3
+info:
+  title: AutoPulse Fleet Service API
+  version: 1.0.0
+  description: |
+    OpenAPI contract for the fleet-service microservice
+    This API manages depots, vehicles, vehicle assignments, vehicle documents,
+    and vehicle maintenance records.
+
+servers:
+  - url: http://localhost:8083
+    description: fleet-service
+  - url: http://localhost:8080
+    description: API Gateway
+
+tags:
+  - name: Depots
+    description: Depot management endpoints
+  - name: Vehicles
+    description: Vehicle management endpoints
+  - name: Vehicle Assignments
+    description: Courier to vehicle assignment endpoints
+  - name: Vehicle Documents
+    description: Vehicle document management endpoints
+  - name: Vehicle Maintenance
+    description: Vehicle maintenance record endpoints
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/fleet/depots:
+    post:
+      tags: [Depots]
+      summary: Create depot
+      operationId: createDepot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepotRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepotResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      tags: [Depots]
+      summary: List depots
+      operationId: getDepots
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDepotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/fleet/depots/{id}:
+    get:
+      tags: [Depots]
+      summary: Get depot by id
+      operationId: getDepotById
+      parameters:
+        - $ref: '#/components/parameters/DepotId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Depots]
+      summary: Update depot
+      operationId: updateDepot
+      parameters:
+        - $ref: '#/components/parameters/DepotId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepotRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepotResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/fleet/depots/{id}/activate:
+    patch:
+      tags: [Depots]
+      summary: Activate depot
+      operationId: activateDepot
+      parameters:
+        - $ref: '#/components/parameters/DepotId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/depots/{id}/deactivate:
+    patch:
+      tags: [Depots]
+      summary: Deactivate depot
+      operationId: deactivateDepot
+      parameters:
+        - $ref: '#/components/parameters/DepotId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/depots/{id}/coordinates:
+    get:
+      tags: [Depots]
+      summary: Get depot coordinates
+      operationId: getDepotCoordinates
+      parameters:
+        - $ref: '#/components/parameters/DepotId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepotCoordinatesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicles:
+    post:
+      tags: [Vehicles]
+      summary: Create vehicle
+      operationId: createVehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVehicleRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      tags: [Vehicles]
+      summary: List vehicles
+      operationId: getVehicles
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVehicleResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/fleet/vehicles/available:
+    get:
+      tags: [Vehicles]
+      summary: List available vehicles by depot
+      operationId: getAvailableVehicles
+      parameters:
+        - name: depotId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVehicleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/fleet/vehicles/depots/{depotId}/available-vehicles:
+    get:
+      tags: [Vehicles]
+      summary: List available vehicle summaries by depot
+      operationId: getAvailableVehicleSummariesByDepot
+      parameters:
+        - name: depotId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageAvailableVehicleSummaryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicles/{id}:
+    get:
+      tags: [Vehicles]
+      summary: Get vehicle by id
+      operationId: getVehicleById
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicles]
+      summary: Update vehicle
+      operationId: updateVehicle
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/fleet/vehicles/{id}/status:
+    patch:
+      tags: [Vehicles]
+      summary: Update vehicle status
+      operationId: updateVehicleStatus
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleStatusRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicles/{id}/activate:
+    patch:
+      tags: [Vehicles]
+      summary: Activate vehicle
+      operationId: activateVehicle
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicles/{id}/deactivate:
+    patch:
+      tags: [Vehicles]
+      summary: Deactivate vehicle
+      operationId: deactivateVehicle
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicle-assignments:
+    post:
+      tags: [Vehicle Assignments]
+      summary: Assign vehicle to courier
+      operationId: createVehicleAssignment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVehicleAssignmentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleAssignmentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      tags: [Vehicle Assignments]
+      summary: List vehicle assignments
+      operationId: getVehicleAssignments
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVehicleAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/fleet/vehicle-assignments/{id}:
+    get:
+      tags: [Vehicle Assignments]
+      summary: Get vehicle assignment by id
+      operationId: getVehicleAssignmentById
+      parameters:
+        - $ref: '#/components/parameters/AssignmentId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicle-assignments/{id}/end:
+    patch:
+      tags: [Vehicle Assignments]
+      summary: End vehicle assignment
+      operationId: endVehicleAssignment
+      parameters:
+        - $ref: '#/components/parameters/AssignmentId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/fleet/couriers/{courierId}/vehicle-assignment:
+    get:
+      tags: [Vehicle Assignments]
+      summary: Get active vehicle assignment for courier
+      operationId: getActiveVehicleAssignmentByCourier
+      parameters:
+        - $ref: '#/components/parameters/CourierId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/couriers/{courierId}/vehicle-assignments:
+    get:
+      tags: [Vehicle Assignments]
+      summary: List assignments by courier
+      operationId: getVehicleAssignmentsByCourier
+      parameters:
+        - $ref: '#/components/parameters/CourierId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVehicleAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicles/{vehicleId}/documents:
+    post:
+      tags: [Vehicle Documents]
+      summary: Create vehicle document
+      operationId: createVehicleDocument
+      parameters:
+        - $ref: '#/components/parameters/VehicleIdPathVehicleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVehicleDocumentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDocumentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      tags: [Vehicle Documents]
+      summary: List documents by vehicle
+      operationId: getVehicleDocumentsByVehicle
+      parameters:
+        - $ref: '#/components/parameters/VehicleIdPathVehicleId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVehicleDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/documents/expired:
+    get:
+      tags: [Vehicle Documents]
+      summary: List expired vehicle documents
+      operationId: getExpiredVehicleDocuments
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVehicleDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/fleet/documents/{documentId}:
+    get:
+      tags: [Vehicle Documents]
+      summary: Get vehicle document by id
+      operationId: getVehicleDocumentById
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicle Documents]
+      summary: Update vehicle document
+      operationId: updateVehicleDocument
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleDocumentRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDocumentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Vehicle Documents]
+      summary: Delete vehicle document
+      operationId: deleteVehicleDocument
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/vehicles/{vehicleId}/maintenance-records:
+    post:
+      tags: [Vehicle Maintenance]
+      summary: Create vehicle maintenance record
+      operationId: createVehicleMaintenanceRecord
+      parameters:
+        - $ref: '#/components/parameters/VehicleIdPathVehicleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVehicleMaintenanceRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleMaintenanceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      tags: [Vehicle Maintenance]
+      summary: List maintenance records by vehicle
+      operationId: getVehicleMaintenanceRecordsByVehicle
+      parameters:
+        - $ref: '#/components/parameters/VehicleIdPathVehicleId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVehicleMaintenanceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/fleet/maintenance-records/{recordId}:
+    get:
+      tags: [Vehicle Maintenance]
+      summary: Get maintenance record by id
+      operationId: getVehicleMaintenanceRecordById
+      parameters:
+        - $ref: '#/components/parameters/MaintenanceRecordId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleMaintenanceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Vehicle Maintenance]
+      summary: Update maintenance record
+      operationId: updateVehicleMaintenanceRecord
+      parameters:
+        - $ref: '#/components/parameters/MaintenanceRecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleMaintenanceRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleMaintenanceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Vehicle Maintenance]
+      summary: Delete maintenance record
+      operationId: deleteVehicleMaintenanceRecord
+      parameters:
+        - $ref: '#/components/parameters/MaintenanceRecordId'
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Zero-based page index
+    Size:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 20
+      description: Page size
+    Sort:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        example: name,asc
+      description: Sort format is property,direction. Example name,asc
+    DepotId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    VehicleId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    VehicleIdPathVehicleId:
+      name: vehicleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    AssignmentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CourierId:
+      name: courierId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    MaintenanceRecordId:
+      name: recordId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    VehicleCategory:
+      type: string
+      enum: [BIKE, SCOOTER, MOTORCYCLE, CAR, VAN, TRUCK]
+    FuelType:
+      type: string
+      enum: [GASOLINE, DIESEL, ELECTRIC, HYBRID, LPG]
+    VehicleStatus:
+      type: string
+      enum: [AVAILABLE, ASSIGNED, IN_MAINTENANCE, INACTIVE]
+    VehicleAssignmentStatus:
+      type: string
+      enum: [ACTIVE, ENDED]
+    VehicleDocumentType:
+      type: string
+      enum: [REGISTRATION_CERTIFICATE, INSURANCE, INSPECTION, LEASE_CONTRACT, OTHER]
+    MaintenanceType:
+      type: string
+      enum: [PREVENTIVE, CORRECTIVE, INSPECTION, REPAIR, OTHER]
+
+    Address:
+      type: object
+      properties:
+        cityId:
+          type: string
+          format: uuid
+        street:
+          type: string
+          maxLength: 150
+        number:
+          type: string
+          maxLength: 30
+        postalCode:
+          type: string
+          maxLength: 20
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+
+    Contact:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 180
+        phone:
+          type: string
+          maxLength: 40
+        address:
+          $ref: '#/components/schemas/Address'
+
+    CreateDepotRequest:
+      type: object
+      required: [name, contact]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        contact:
+          $ref: '#/components/schemas/Contact'
+
+    UpdateDepotRequest:
+      type: object
+      required: [name, contact]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        contact:
+          $ref: '#/components/schemas/Contact'
+
+    DepotResponse:
+      type: object
+      required: [id, name, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        contact:
+          $ref: '#/components/schemas/Contact'
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DepotCoordinatesResponse:
+      type: object
+      required: [depotId, latitude, longitude]
+      properties:
+        depotId:
+          type: string
+          format: uuid
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+
+    CreateVehicleRequest:
+      type: object
+      required: [depotId, licensePlate, category, capacityWeightKg, capacityVolumeM3]
+      properties:
+        depotId:
+          type: string
+          format: uuid
+        licensePlate:
+          type: string
+          minLength: 1
+          maxLength: 30
+        category:
+          $ref: '#/components/schemas/VehicleCategory'
+        fuelType:
+          $ref: '#/components/schemas/FuelType'
+        capacityWeightKg:
+          type: number
+          format: double
+          minimum: 0
+        capacityVolumeM3:
+          type: number
+          format: double
+          minimum: 0
+        model:
+          type: string
+          maxLength: 120
+        manufacturer:
+          type: string
+          maxLength: 120
+        manufactureYear:
+          type: integer
+          minimum: 1900
+        vin:
+          type: string
+          maxLength: 80
+
+    UpdateVehicleRequest:
+      type: object
+      properties:
+        depotId:
+          type: string
+          format: uuid
+        licensePlate:
+          type: string
+          minLength: 1
+          maxLength: 30
+        category:
+          $ref: '#/components/schemas/VehicleCategory'
+        fuelType:
+          $ref: '#/components/schemas/FuelType'
+        capacityWeightKg:
+          type: number
+          format: double
+          minimum: 0
+        capacityVolumeM3:
+          type: number
+          format: double
+          minimum: 0
+        model:
+          type: string
+          maxLength: 120
+        manufacturer:
+          type: string
+          maxLength: 120
+        manufactureYear:
+          type: integer
+          minimum: 1900
+        vin:
+          type: string
+          maxLength: 80
+
+    UpdateVehicleStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/VehicleStatus'
+
+    VehicleResponse:
+      type: object
+      required: [id, depotId, licensePlate, category, status, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        depotId:
+          type: string
+          format: uuid
+        depotName:
+          type: string
+        licensePlate:
+          type: string
+        category:
+          $ref: '#/components/schemas/VehicleCategory'
+        fuelType:
+          $ref: '#/components/schemas/FuelType'
+        status:
+          $ref: '#/components/schemas/VehicleStatus'
+        capacityWeightKg:
+          type: number
+          format: double
+        capacityVolumeM3:
+          type: number
+          format: double
+        model:
+          type: string
+        manufacturer:
+          type: string
+        manufactureYear:
+          type: integer
+        vin:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AvailableVehicleSummaryResponse:
+      type: object
+      required: [id, licensePlate, category]
+      properties:
+        id:
+          type: string
+          format: uuid
+        licensePlate:
+          type: string
+        category:
+          $ref: '#/components/schemas/VehicleCategory'
+        capacityWeightKg:
+          type: number
+          format: double
+        capacityVolumeM3:
+          type: number
+          format: double
+
+    CreateVehicleAssignmentRequest:
+      type: object
+      required: [vehicleId, courierId]
+      properties:
+        vehicleId:
+          type: string
+          format: uuid
+        courierId:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    VehicleAssignmentResponse:
+      type: object
+      required: [id, vehicleId, courierId, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehicleId:
+          type: string
+          format: uuid
+        courierId:
+          type: string
+          format: uuid
+        vehicleLicensePlate:
+          type: string
+        status:
+          $ref: '#/components/schemas/VehicleAssignmentStatus'
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreateVehicleDocumentRequest:
+      type: object
+      required: [type, documentNumber, issuedAt, expiresAt]
+      properties:
+        type:
+          $ref: '#/components/schemas/VehicleDocumentType'
+        documentNumber:
+          type: string
+          minLength: 1
+          maxLength: 100
+        issuedAt:
+          type: string
+          format: date
+        expiresAt:
+          type: string
+          format: date
+        fileUrl:
+          type: string
+          format: uri
+          nullable: true
+
+    UpdateVehicleDocumentRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/VehicleDocumentType'
+        documentNumber:
+          type: string
+          minLength: 1
+          maxLength: 100
+        issuedAt:
+          type: string
+          format: date
+        expiresAt:
+          type: string
+          format: date
+        fileUrl:
+          type: string
+          format: uri
+          nullable: true
+
+    VehicleDocumentResponse:
+      type: object
+      required: [id, vehicleId, type, documentNumber, issuedAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehicleId:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/VehicleDocumentType'
+        documentNumber:
+          type: string
+        issuedAt:
+          type: string
+          format: date
+        expiresAt:
+          type: string
+          format: date
+        expired:
+          type: boolean
+        fileUrl:
+          type: string
+          format: uri
+          nullable: true
+
+    CreateVehicleMaintenanceRequest:
+      type: object
+      required: [maintenanceDate, description]
+      properties:
+        maintenanceDate:
+          type: string
+          format: date
+        type:
+          $ref: '#/components/schemas/MaintenanceType'
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        cost:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+        performedBy:
+          type: string
+          maxLength: 150
+          nullable: true
+        nextMaintenanceDate:
+          type: string
+          format: date
+          nullable: true
+
+    UpdateVehicleMaintenanceRequest:
+      type: object
+      properties:
+        maintenanceDate:
+          type: string
+          format: date
+        type:
+          $ref: '#/components/schemas/MaintenanceType'
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        cost:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+        performedBy:
+          type: string
+          maxLength: 150
+          nullable: true
+        nextMaintenanceDate:
+          type: string
+          format: date
+          nullable: true
+
+    VehicleMaintenanceResponse:
+      type: object
+      required: [id, vehicleId, maintenanceDate, description]
+      properties:
+        id:
+          type: string
+          format: uuid
+        vehicleId:
+          type: string
+          format: uuid
+        maintenanceDate:
+          type: string
+          format: date
+        type:
+          $ref: '#/components/schemas/MaintenanceType'
+        description:
+          type: string
+        cost:
+          type: number
+          format: double
+          nullable: true
+        performedBy:
+          type: string
+          nullable: true
+        nextMaintenanceDate:
+          type: string
+          format: date
+          nullable: true
+
+    PageDepotResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/DepotResponse'
+    PageVehicleResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/VehicleResponse'
+    PageAvailableVehicleSummaryResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/AvailableVehicleSummaryResponse'
+    PageVehicleAssignmentResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/VehicleAssignmentResponse'
+    PageVehicleDocumentResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/VehicleDocumentResponse'
+    PageVehicleMaintenanceResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/VehicleMaintenanceResponse'
+
+    PageResponse:
+      type: object
+      required: [content, totalElements, totalPages, size, number]
+      properties:
+        content:
+          type: array
+          items:
+            type: object
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+        empty:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, errorCode, message, path]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        errorCode:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Request validation failed
+        path:
+          type: string
+          example: /api/fleet/vehicles
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+
+    ValidationError:
+      type: object
+      required: [field, message]
+      properties:
+        field:
+          type: string
+          example: licensePlate
+        message:
+          type: string
+          example: must not be blank

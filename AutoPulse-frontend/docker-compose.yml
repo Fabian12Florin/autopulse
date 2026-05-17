@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        VITE_API_BASE_URL: /api
+    image: autopulse-frontend:local
+    container_name: autopulse-frontend
+    ports:
+      - "3050:80"
+    extra_hosts:
+      - "api-gateway:host-gateway"

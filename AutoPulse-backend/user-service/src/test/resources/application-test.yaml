@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:user_service_test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+keycloak:
+  admin:
+    base-url: http://localhost:8008
+    realm: autopulse-test
+    client-id: user-service-test-client
+    client-secret: test-secret
+    roles:
+      admin: ADMIN
+      dispatcher: DISPATCHER
+      courier: COURIER

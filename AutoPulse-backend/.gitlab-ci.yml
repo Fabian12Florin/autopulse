@@ -1,0 +1,217 @@
+default:
+  tags:
+    - docker
+
+stages:
+  - test
+  - sonar
+  - build
+  - push
+  - pages
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
+
+  POSTGRES_DB: autopulse
+  POSTGRES_USER: autopulse
+  POSTGRES_PASSWORD: autopulse
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .m2/repository/
+
+test-h2-services:
+  stage: test
+  image: maven:3.9.9-eclipse-temurin-21
+  variables:
+    SPRING_PROFILES_ACTIVE: test
+    EUREKA_CLIENT_ENABLED: "false"
+    SPRING_CLOUD_DISCOVERY_ENABLED: "false"
+  script:
+    - mvn $MAVEN_CLI_OPTS -pl user-service -am clean verify
+    - |
+      if find . -path "*/target/site/jacoco/jacoco.csv" | grep -q .; then
+        awk -F',' '
+          FNR>1 { missed+=$4; covered+=$5 }
+          END {
+            total = missed + covered
+            pct = (total>0) ? (covered*100.0/total) : 0
+            printf("Total Coverage: %.0f%%\n", pct)
+          }' $(find . -path "*/target/site/jacoco/jacoco.csv")
+      else
+        echo "Total Coverage: 0% (jacoco.csv not found)"
+      fi
+  artifacts:
+    when: always
+    paths:
+      - "*/target/site/jacoco/"
+      - "*/target/surefire-reports/"
+      - "*/target/failsafe-reports/"
+    reports:
+      junit:
+        - "*/target/surefire-reports/TEST-*.xml"
+        - "*/target/failsafe-reports/TEST-*.xml"
+    expire_in: 1 week
+  coverage: '/Total Coverage:\s*([0-9]{1,3})%/'
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+test-postgres-services:
+  stage: test
+  image: maven:3.9.9-eclipse-temurin-21
+  services:
+    - name: postgres:17
+      alias: postgres
+  variables:
+    SPRING_PROFILES_ACTIVE: ci
+    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/$POSTGRES_DB
+    SPRING_DATASOURCE_USERNAME: $POSTGRES_USER
+    SPRING_DATASOURCE_PASSWORD: $POSTGRES_PASSWORD
+    EUREKA_CLIENT_ENABLED: "false"
+    SPRING_CLOUD_DISCOVERY_ENABLED: "false"
+  script:
+    - mvn $MAVEN_CLI_OPTS -pl fleet-service,geography-service,parcel-service,delivery-execution-service,routing-service -am clean verify
+    - |
+      if find . -path "*/target/site/jacoco/jacoco.csv" | grep -q .; then
+        awk -F',' '
+          FNR>1 { missed+=$4; covered+=$5 }
+          END {
+            total = missed + covered
+            pct = (total>0) ? (covered*100.0/total) : 0
+            printf("Total Coverage: %.0f%%\n", pct)
+          }' $(find . -path "*/target/site/jacoco/jacoco.csv")
+      else
+        echo "Total Coverage: 0% (jacoco.csv not found)"
+      fi
+  artifacts:
+    when: always
+    paths:
+      - "*/target/site/jacoco/"
+      - "*/target/surefire-reports/"
+      - "*/target/failsafe-reports/"
+    reports:
+      junit:
+        - "*/target/surefire-reports/TEST-*.xml"
+        - "*/target/failsafe-reports/TEST-*.xml"
+    expire_in: 1 week
+  coverage: '/Total Coverage:\s*([0-9]{1,3})%/'
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+sonar:
+  stage: sonar
+  image: maven:3.9.9-eclipse-temurin-21
+  needs:
+    - job: test-h2-services
+      artifacts: true
+    - job: test-postgres-services
+      artifacts: true
+  script:
+    - mvn $MAVEN_CLI_OPTS compile test-compile sonar:sonar
+      -Dsonar.host.url=http://host.docker.internal:9000
+      -Dsonar.token=$SONAR_TOKEN
+      -Dsonar.projectKey=autopulse-backend
+      -Dsonar.coverage.jacoco.xmlReportPaths="**/target/site/jacoco/jacoco.xml"
+  rules:
+    - when: manual
+  allow_failure: true
+
+build-images:
+  stage: build
+  image: docker:24
+  variables:
+    DOCKER_HOST: "unix:///var/run/docker.sock"
+  parallel:
+    matrix:
+      - SERVICE_NAME:
+          - api-gateway
+          - discovery-service
+          - fleet-service
+          - user-service
+          - geography-service
+          - parcel-service
+          - delivery-execution-service
+          - routing-service
+          - notification-service
+  before_script:
+    - docker info
+  script:
+    - docker build -f $SERVICE_NAME/Dockerfile -t autopulse-$SERVICE_NAME:$CI_COMMIT_SHORT_SHA .
+    - docker build -f $SERVICE_NAME/Dockerfile -t autopulse-$SERVICE_NAME:latest .
+    - docker images | grep autopulse-$SERVICE_NAME
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+push-images-acr:
+  stage: push
+  image: docker:24
+  variables:
+    DOCKER_HOST: "unix:///var/run/docker.sock"
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end"
+
+    POSTGRES_DB: autopulse
+    POSTGRES_USER: autopulse
+    POSTGRES_PASSWORD: autopulse
+
+    IMAGE_VERSION: "1.4"
+    ACR_LOGIN_SERVER: "crautopulsedev.azurecr.io"
+  parallel:
+    matrix:
+      - SERVICE_NAME:
+          - api-gateway
+          - discovery-service
+          - fleet-service
+          - user-service
+          - geography-service
+          - parcel-service
+          - delivery-execution-service
+          - routing-service
+          - notification-service
+  before_script:
+    - docker info
+    - echo "$ACR_PASSWORD" | docker login "$ACR_LOGIN_SERVER" -u "$ACR_USERNAME" --password-stdin
+  script:
+    - docker build -f $SERVICE_NAME/Dockerfile -t $ACR_LOGIN_SERVER/autopulse-$SERVICE_NAME:$IMAGE_VERSION .
+    - docker tag $ACR_LOGIN_SERVER/autopulse-$SERVICE_NAME:$IMAGE_VERSION $ACR_LOGIN_SERVER/autopulse-$SERVICE_NAME:$CI_COMMIT_SHORT_SHA
+    - docker push $ACR_LOGIN_SERVER/autopulse-$SERVICE_NAME:$IMAGE_VERSION
+    - docker push $ACR_LOGIN_SERVER/autopulse-$SERVICE_NAME:$CI_COMMIT_SHORT_SHA
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+
+pages:
+  stage: pages
+  image: alpine:3.20
+  needs:
+    - job: test-h2-services
+      artifacts: true
+    - job: test-postgres-services
+      artifacts: true
+  script:
+    - mkdir -p public
+    - |
+      for report in $(find . -mindepth 2 -path "./*/target/site/jacoco/index.html"); do
+        service=$(echo "$report" | cut -d/ -f2)
+        mkdir -p "public/$service"
+        cp -r "$service/target/site/jacoco/"* "public/$service/"
+      done
+    - echo '<h1>AutoPulse JaCoCo Reports</h1><ul>' > public/index.html
+    - |
+      for dir in public/*/; do
+        name=$(basename "$dir")
+        echo "<li><a href=\"$name/index.html\">$name</a></li>" >> public/index.html
+      done
+    - echo '</ul>' >> public/index.html
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+

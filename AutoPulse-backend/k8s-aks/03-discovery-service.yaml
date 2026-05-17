@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discovery-service
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discovery-service
+  template:
+    metadata:
+      labels:
+        app: discovery-service
+    spec:
+      containers:
+        - name: discovery-service
+          image: crautopulsedev.azurecr.io/autopulse-discovery-service:1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8761
+          env:
+            - name: PORT
+              value: "8761"
+            - name: EUREKA_HOSTNAME
+              value: discovery-service
+            - name: EUREKA_URL
+              value: http://discovery-service:8761/eureka
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8761
+            initialDelaySeconds: 25
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8761
+            initialDelaySeconds: 60
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discovery-service
+  namespace: autopulse
+spec:
+  type: NodePort
+  selector:
+    app: discovery-service
+  ports:
+    - port: 8761
+      targetPort: 8761
+      nodePort: 30761

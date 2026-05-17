@@ -1,0 +1,43 @@
+services:
+  build-all:
+    image: maven:3.9.9-eclipse-temurin-21
+    working_dir: /app
+    volumes:
+      - .:/app
+      - maven_cache:/root/.m2
+    command: mvn clean package -DskipTests
+    profiles:
+      - tools
+
+  test-all:
+    image: maven:3.9.9-eclipse-temurin-21
+    working_dir: /app
+    volumes:
+      - .:/app
+      - maven_cache:/root/.m2
+    command: mvn clean verify
+    profiles:
+      - tools
+
+  build-fleet:
+    image: maven:3.9.9-eclipse-temurin-21
+    working_dir: /app
+    volumes:
+      - .:/app
+      - maven_cache:/root/.m2
+    command: mvn -pl fleet-service -am clean package -DskipTests
+    profiles:
+      - tools
+
+  test-fleet:
+    image: maven:3.9.9-eclipse-temurin-21
+    working_dir: /app
+    volumes:
+      - .:/app
+      - maven_cache:/root/.m2
+    command: mvn -pl fleet-service -am verify
+    profiles:
+      - tools
+
+volumes:
+  maven_cache:

@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geography-service
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geography-service
+  template:
+    metadata:
+      labels:
+        app: geography-service
+    spec:
+      containers:
+        - name: geography-service
+          image: crautopulsedev.azurecr.io/autopulse-geography-service:1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: autopulse-config
+          env:
+            - name: SERVER_PORT
+              value: "8085"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: GEOGRAPHY_DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: GEOGRAPHY_DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: GEOGRAPHY_DB_NAME
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: GEOGRAPHY_DB_SCHEMA
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: GEOGRAPHY_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: GEOGRAPHY_DB_PASSWORD
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: GEOGRAPHY_DB_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: GEOGRAPHY_DB_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: GEOGRAPHY_DB_PASSWORD
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: OAUTH2_ISSUER_URI
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geography-service
+  namespace: autopulse
+spec:
+  selector:
+    app: geography-service
+  ports:
+    - port: 8085
+      targetPort: 8085

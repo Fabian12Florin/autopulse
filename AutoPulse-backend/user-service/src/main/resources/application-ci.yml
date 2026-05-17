@@ -1,0 +1,29 @@
+server:
+  port: ${SERVER_PORT:8084}
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}?currentSchema=user_service
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: ${DB_SCHEMA:user_service}
+        format_sql: false
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+keycloak:
+  admin:
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+    admin-username: ${KEYCLOAK_ADMIN_USERNAME}
+    admin-password: ${KEYCLOAK_ADMIN_PASSWORD}

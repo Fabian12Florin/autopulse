@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vroom-config
+  namespace: autopulse
+data:
+  config.yml: |
+    cliArgs:
+      geometry: false
+      planmode: false
+      threads: 4
+      explore: 5
+      limit: '1mb'
+      logdir: '..'
+      logsize: '100M'
+      maxlocations: 1000
+      maxvehicles: 200
+      override: ['c', 'g', 'l', 't', 'x']
+      path: ''
+      port: 3000
+      router: 'osrm'
+      timeout: 300000
+      baseurl: '/'
+    routingServers:
+      osrm:
+        car:
+          host: 'osrm'
+          port: '5000'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vroom
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vroom
+  template:
+    metadata:
+      labels:
+        app: vroom
+    spec:
+      containers:
+        - name: vroom
+          image: ghcr.io/vroom-project/vroom-docker:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: VROOM_ROUTER
+              value: osrm
+            - name: VROOM_LOG
+              value: /vroom-express
+          volumeMounts:
+            - name: vroom-config
+              mountPath: /vroom-express/config.yml
+              subPath: config.yml
+              readOnly: true
+      volumes:
+        - name: vroom-config
+          configMap:
+            name: vroom-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vroom
+  namespace: autopulse
+spec:
+  selector:
+    app: vroom
+  ports:
+    - port: 3000
+      targetPort: 3000

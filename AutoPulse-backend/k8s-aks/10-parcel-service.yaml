@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parcel-service
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parcel-service
+  template:
+    metadata:
+      labels:
+        app: parcel-service
+    spec:
+      containers:
+        - name: parcel-service
+          image: crautopulsedev.azurecr.io/autopulse-parcel-service:1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: autopulse-config
+          env:
+            - name: SERVER_PORT
+              value: "8082"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: PARCEL_DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: PARCEL_DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: PARCEL_DB_NAME
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: PARCEL_DB_SCHEMA
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: PARCEL_DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: PARCEL_DB_PASSWORD
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: PARCEL_DB_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: PARCEL_DB_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: autopulse-secrets
+                  key: PARCEL_DB_PASSWORD
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: autopulse-config
+                  key: OAUTH2_ISSUER_URI
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parcel-service
+  namespace: autopulse
+spec:
+  selector:
+    app: parcel-service
+  ports:
+    - port: 8082
+      targetPort: 8082

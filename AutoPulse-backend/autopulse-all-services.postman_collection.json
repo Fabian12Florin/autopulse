@@ -1,0 +1,2607 @@
+{
+  "info": {
+    "_postman_id": "cd1efad0-8992-4b43-a78d-8e3d3e9fc2f1",
+    "name": "AutoPulse - All Microservices",
+    "description": "Comprehensive AutoPulse collection grouped by microservice and logical area. Default baseUrl points to the API Gateway.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "gatewayUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "routingServiceUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "fleetServiceUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "parcelServiceUrl",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "userServiceUrl",
+      "value": "http://localhost:8084"
+    },
+    {
+      "key": "geographyServiceUrl",
+      "value": "http://localhost:8085"
+    },
+    {
+      "key": "deliveryServiceUrl",
+      "value": "http://localhost:8086"
+    },
+    {
+      "key": "discoveryUrl",
+      "value": "http://localhost:8761"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "regionCode",
+      "value": "TM"
+    },
+    {
+      "key": "depotCode",
+      "value": "TMS01"
+    },
+    {
+      "key": "routeDate",
+      "value": "2026-04-29"
+    },
+    {
+      "key": "regionId",
+      "value": "00000000-0000-0000-0000-000000000101"
+    },
+    {
+      "key": "localityId",
+      "value": "00000000-0000-0000-0000-000000000102"
+    },
+    {
+      "key": "depotId",
+      "value": "00000000-0000-0000-0000-000000000201"
+    },
+    {
+      "key": "vehicleId",
+      "value": "00000000-0000-0000-0000-000000000301"
+    },
+    {
+      "key": "vehicleAssignmentId",
+      "value": "00000000-0000-0000-0000-000000000302"
+    },
+    {
+      "key": "documentId",
+      "value": "00000000-0000-0000-0000-000000000303"
+    },
+    {
+      "key": "maintenanceRecordId",
+      "value": "00000000-0000-0000-0000-000000000304"
+    },
+    {
+      "key": "userId",
+      "value": "00000000-0000-0000-0000-000000000401"
+    },
+    {
+      "key": "dispatcherProfileId",
+      "value": "00000000-0000-0000-0000-000000000402"
+    },
+    {
+      "key": "courierProfileId",
+      "value": "00000000-0000-0000-0000-000000000403"
+    },
+    {
+      "key": "parcelId",
+      "value": "00000000-0000-0000-0000-000000000501"
+    },
+    {
+      "key": "awb",
+      "value": "TMS0100000001"
+    },
+    {
+      "key": "deliveryPin",
+      "value": "1234"
+    },
+    {
+      "key": "routingJobId",
+      "value": "00000000-0000-0000-0000-000000000601"
+    },
+    {
+      "key": "routeId",
+      "value": "00000000-0000-0000-0000-000000000602"
+    },
+    {
+      "key": "routeStopId",
+      "value": "00000000-0000-0000-0000-000000000603"
+    },
+    {
+      "key": "deliveryRunId",
+      "value": "00000000-0000-0000-0000-000000000701"
+    },
+    {
+      "key": "deliveryStopExecutionId",
+      "value": "00000000-0000-0000-0000-000000000702"
+    },
+    {
+      "key": "deliveryParcelExecutionId",
+      "value": "00000000-0000-0000-0000-000000000703"
+    }
+  ],
+  "item": [
+    {
+      "name": "User Service",
+      "item": [
+        {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/auth/login",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@autopulse.local\",\n  \"password\": \"Admin1234\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.accessToken) pm.collectionVariables.set('accessToken', json.accessToken);",
+                      "if (json.refreshToken) pm.collectionVariables.set('refreshToken', json.refreshToken);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Refresh Token",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/auth/refresh",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.accessToken) pm.collectionVariables.set('accessToken', json.accessToken);",
+                      "if (json.refreshToken) pm.collectionVariables.set('refreshToken', json.refreshToken);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/auth/logout",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Request Password Reset",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/auth/reset-password",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"courier.timisoara@autopulse.local\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Current User",
+          "item": [
+            {
+              "name": "Get Me",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/me"
+              }
+            },
+            {
+              "name": "Update Me",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/me",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"me.updated@autopulse.local\",\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Me\",\n  \"phoneNumber\": \"+40740000008\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Change My Password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/me/change-password",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\": \"OldPass123\",\n  \"newPassword\": \"NewPass123\",\n  \"confirmNewPassword\": \"NewPass123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Update My Courier Availability",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/me/courier/availability",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"availabilityStatus\": \"AVAILABLE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Users",
+          "item": [
+            {
+              "name": "Get User",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/admin/{{userId}}"
+              }
+            },
+            {
+              "name": "Update User",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/admin/{{userId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user.updated@autopulse.local\",\n  \"firstName\": \"Updated\",\n  \"lastName\": \"User\",\n  \"phoneNumber\": \"+40740000009\",\n  \"active\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Create Dispatcher",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/admin/dispatchers",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"dispatcher.timisoara@autopulse.local\",\n  \"firstName\": \"Diana\",\n  \"lastName\": \"Dispatcher\",\n  \"phoneNumber\": \"+40740000002\",\n  \"regionCode\": \"{{regionCode}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.dispatcherProfileId) pm.collectionVariables.set('dispatcherProfileId', json.dispatcherProfileId);",
+                      "if (json.user && json.user.id) pm.collectionVariables.set('userId', json.user.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Dispatcher",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/admin/dispatchers/{{dispatcherProfileId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"dispatcher.timisoara@autopulse.local\",\n  \"firstName\": \"Diana\",\n  \"lastName\": \"Dispatcher\",\n  \"phoneNumber\": \"+40740000002\",\n  \"regionCode\": \"{{regionCode}}\",\n  \"active\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Create Courier",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/admin/couriers",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"courier.timisoara@autopulse.local\",\n  \"firstName\": \"Cristian\",\n  \"lastName\": \"Courier\",\n  \"phoneNumber\": \"+40740000003\",\n  \"depotId\": \"{{depotId}}\",\n  \"regionCode\": \"{{regionCode}}\",\n  \"availabilityStatus\": \"AVAILABLE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.courierProfileId) pm.collectionVariables.set('courierProfileId', json.courierProfileId);",
+                      "if (json.user && json.user.id) pm.collectionVariables.set('userId', json.user.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Courier",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/admin/couriers/{{courierProfileId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"courier.timisoara@autopulse.local\",\n  \"firstName\": \"Cristian\",\n  \"lastName\": \"Courier\",\n  \"phoneNumber\": \"+40740000003\",\n  \"depotId\": \"{{depotId}}\",\n  \"regionCode\": \"{{regionCode}}\",\n  \"availabilityStatus\": \"AVAILABLE\",\n  \"active\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Activate User",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/admin/{{userId}}/activate"
+              }
+            },
+            {
+              "name": "Deactivate User",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/admin/{{userId}}/deactivate"
+              }
+            },
+            {
+              "name": "Reset User Password",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/admin/{{userId}}/reset-password"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dispatcher Operations",
+          "item": [
+            {
+              "name": "Get Dispatcher Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/dispatcher/profiles/{{dispatcherProfileId}}"
+              }
+            },
+            {
+              "name": "Search Couriers as Dispatcher",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/dispatcher/couriers?depotId={{depotId}}&regionCode={{regionCode}}&availabilityStatus=AVAILABLE&active=true&page=0&size=20"
+              }
+            },
+            {
+              "name": "Get Courier as Dispatcher",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/dispatcher/couriers/{{courierProfileId}}"
+              }
+            },
+            {
+              "name": "Create Courier as Dispatcher",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/dispatcher/couriers",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"courier.timisoara@autopulse.local\",\n  \"firstName\": \"Cristian\",\n  \"lastName\": \"Courier\",\n  \"phoneNumber\": \"+40740000003\",\n  \"depotId\": \"{{depotId}}\",\n  \"regionCode\": \"{{regionCode}}\",\n  \"availabilityStatus\": \"AVAILABLE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.courierProfileId) pm.collectionVariables.set('courierProfileId', json.courierProfileId);",
+                      "if (json.user && json.user.id) pm.collectionVariables.set('userId', json.user.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Courier as Dispatcher",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/users/dispatcher/couriers/{{courierProfileId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"courier.timisoara@autopulse.local\",\n  \"firstName\": \"Cristian\",\n  \"lastName\": \"Courier\",\n  \"phoneNumber\": \"+40740000003\",\n  \"depotId\": \"{{depotId}}\",\n  \"regionCode\": \"{{regionCode}}\",\n  \"availabilityStatus\": \"AVAILABLE\",\n  \"active\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queries",
+          "item": [
+            {
+              "name": "Search Users",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/query/users?email=&firstName=&lastName=&phoneNumber=&active=true&page=0&size=20"
+              }
+            },
+            {
+              "name": "Search Dispatchers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/query/dispatchers?regionCode={{regionCode}}&active=true&page=0&size=20"
+              }
+            },
+            {
+              "name": "Search Couriers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/query/couriers?depotId={{depotId}}&regionCode={{regionCode}}&availabilityStatus=AVAILABLE&active=true&page=0&size=20"
+              }
+            },
+            {
+              "name": "List Available Couriers by Depot",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/query/couriers/available?depotId={{depotId}}&page=0&size=20"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const items = Array.isArray(json) ? json : (json.content || []);",
+                      "if (items.length > 0 && items[0].courierProfileId) pm.collectionVariables.set('courierProfileId', items[0].courierProfileId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Courier by Profile Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/users/query/couriers/{{courierProfileId}}"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Geography Service",
+      "item": [
+        {
+          "name": "Admin Regions",
+          "item": [
+            {
+              "name": "Get Region",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/admin/regions/{{regionId}}"
+              }
+            },
+            {
+              "name": "Create Region",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/geography/admin/regions",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Timis\",\n  \"code\": \"{{regionCode}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('regionId', json.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Region",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/geography/admin/regions/{{regionId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Timis\",\n  \"code\": \"{{regionCode}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Localities",
+          "item": [
+            {
+              "name": "Get Locality",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/admin/localities/{{localityId}}"
+              }
+            },
+            {
+              "name": "Create Locality",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/geography/admin/localities",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Timisoara\",\n  \"code\": \"TM-TSR\",\n  \"regionId\": \"{{regionId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('localityId', json.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Locality",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/geography/admin/localities/{{localityId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Timisoara\",\n  \"code\": \"TM-TSR\",\n  \"regionId\": \"{{regionId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Queries",
+          "item": [
+            {
+              "name": "Search Regions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/query/regions?name=&code={{regionCode}}&page=0&size=20"
+              }
+            },
+            {
+              "name": "Get Region by Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/query/regions/{{regionId}}"
+              }
+            },
+            {
+              "name": "Get Region by Code",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/query/regions/by-code/{{regionCode}}"
+              }
+            },
+            {
+              "name": "Search Localities",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/query/localities?name=&code=TM-TSR&regionId={{regionId}}&regionCode={{regionCode}}&page=0&size=20"
+              }
+            },
+            {
+              "name": "Get Locality by Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/query/localities/{{localityId}}"
+              }
+            },
+            {
+              "name": "Get Locality by Code",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/query/localities/by-code/TM-TSR"
+              }
+            },
+            {
+              "name": "Resolve Coordinates",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/geography/query/coordinates",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"street\": \"Bulevardul Revolutiei 1989 2\",\n  \"city\": \"Timisoara\",\n  \"county\": \"Timis\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Internal APIs",
+          "item": [
+            {
+              "name": "Get Region Reference",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/internal/regions/{{regionId}}"
+              }
+            },
+            {
+              "name": "Get Region Reference by Code",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/internal/regions/by-code/{{regionCode}}"
+              }
+            },
+            {
+              "name": "Get Locality Reference",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/internal/localities/{{localityId}}"
+              }
+            },
+            {
+              "name": "Get Locality Reference by Code",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/geography/internal/localities/by-code/TM-TSR"
+              }
+            },
+            {
+              "name": "Resolve Coordinates Internal",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/geography/internal/coordinates",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"street\": \"Bulevardul Revolutiei 1989 2\",\n  \"city\": \"Timisoara\",\n  \"county\": \"Timis\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fleet Service",
+      "item": [
+        {
+          "name": "Depots",
+          "item": [
+            {
+              "name": "Create Depot",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/depots",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Timisoara Depot\",\n  \"addressStreet\": \"Calea Sagului\",\n  \"addressNumber\": \"12\",\n  \"localityId\": \"{{localityId}}\",\n  \"localityCode\": \"TM-TSR\",\n  \"contactName\": \"Depot Manager\",\n  \"contactPhone\": \"+40740000001\",\n  \"contactEmail\": \"depot.timisoara@autopulse.local\",\n  \"depotCode\": \"{{depotCode}}\",\n  \"latitude\": 45.7489,\n  \"longitude\": 21.2087\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('depotId', json.id);",
+                      "if (json.depotCode) pm.collectionVariables.set('depotCode', json.depotCode);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Depots",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/depots?page=0&size=10"
+              }
+            },
+            {
+              "name": "Get Depot",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/depots/{{depotId}}"
+              }
+            },
+            {
+              "name": "Update Depot",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/depots/{{depotId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Timisoara Depot\",\n  \"addressStreet\": \"Calea Sagului\",\n  \"addressNumber\": \"12\",\n  \"localityId\": \"{{localityId}}\",\n  \"localityCode\": \"TM-TSR\",\n  \"contactName\": \"Depot Manager\",\n  \"contactPhone\": \"+40740000001\",\n  \"contactEmail\": \"depot.timisoara@autopulse.local\",\n  \"depotCode\": \"{{depotCode}}\",\n  \"latitude\": 45.7489,\n  \"longitude\": 21.2087\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Activate Depot",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/depots/{{depotId}}/activate"
+              }
+            },
+            {
+              "name": "Deactivate Depot",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/depots/{{depotId}}/deactivate"
+              }
+            },
+            {
+              "name": "Get Depot Coordinates",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/depots/{{depotId}}/coordinates"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vehicles",
+          "item": [
+            {
+              "name": "Create Vehicle",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/vehicles",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"depotId\": \"{{depotId}}\",\n  \"licensePlate\": \"TM01APL\",\n  \"brand\": \"Ford\",\n  \"model\": \"Transit\",\n  \"vin\": \"WF0XXXTTGXPK00001\",\n  \"year\": 2024,\n  \"category\": \"M1\",\n  \"fuelType\": \"DIESEL\",\n  \"capacityWeight\": 1200,\n  \"capacityVolume\": 12\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('vehicleId', json.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Vehicles",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles?page=0&size=10"
+              }
+            },
+            {
+              "name": "Get Vehicle",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}"
+              }
+            },
+            {
+              "name": "Update Vehicle",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"depotId\": \"{{depotId}}\",\n  \"licensePlate\": \"TM01APL\",\n  \"brand\": \"Ford\",\n  \"model\": \"Transit\",\n  \"vin\": \"WF0XXXTTGXPK00001\",\n  \"year\": 2024,\n  \"category\": \"M1\",\n  \"fuelType\": \"DIESEL\",\n  \"capacityWeight\": 1200,\n  \"capacityVolume\": 12\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Update Vehicle Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}/status",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"AVAILABLE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Activate Vehicle",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}/activate"
+              }
+            },
+            {
+              "name": "Deactivate Vehicle",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}/deactivate"
+              }
+            },
+            {
+              "name": "Get Available Vehicles by Depot Query",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles/available?depotId={{depotId}}&page=0&size=10"
+              }
+            },
+            {
+              "name": "Get Available Vehicle Summaries by Depot",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles/depots/{{depotId}}/available-vehicles?page=0&size=10"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vehicle Assignments",
+          "item": [
+            {
+              "name": "Assign Vehicle to Courier",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/vehicle-assignments",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"vehicleId\": \"{{vehicleId}}\",\n  \"courierId\": \"{{courierProfileId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('vehicleAssignmentId', json.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "End Vehicle Assignment",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicle-assignments/{{vehicleAssignmentId}}/end"
+              }
+            },
+            {
+              "name": "List Vehicle Assignments",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicle-assignments?page=0&size=10"
+              }
+            },
+            {
+              "name": "Get Vehicle Assignment",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicle-assignments/{{vehicleAssignmentId}}"
+              }
+            },
+            {
+              "name": "Get Active Assignment by Courier",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/couriers/{{courierProfileId}}/vehicle-assignment"
+              }
+            },
+            {
+              "name": "List Assignments by Courier",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/couriers/{{courierProfileId}}/vehicle-assignments?page=0&size=10"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vehicle Documents",
+          "item": [
+            {
+              "name": "Create Vehicle Document",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}/documents",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"documentType\": \"INSURANCE\",\n  \"issuedAt\": \"2026-01-01\",\n  \"expiresAt\": \"2027-01-01\",\n  \"cost\": 450,\n  \"description\": \"Annual insurance policy\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('documentId', json.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Vehicle Documents",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}/documents?page=0&size=10"
+              }
+            },
+            {
+              "name": "Get Vehicle Document",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/documents/{{documentId}}"
+              }
+            },
+            {
+              "name": "Update Vehicle Document",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/documents/{{documentId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"documentType\": \"INSURANCE\",\n  \"issuedAt\": \"2026-01-01\",\n  \"expiresAt\": \"2027-01-01\",\n  \"cost\": 450,\n  \"description\": \"Annual insurance policy\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Delete Vehicle Document",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/documents/{{documentId}}"
+              }
+            },
+            {
+              "name": "List Expired Vehicle Documents",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/documents/expired?page=0&size=10"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Maintenance Records",
+          "item": [
+            {
+              "name": "Create Maintenance Record",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}/maintenance-records",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"mileage\": 25000,\n  \"serviceDate\": \"2026-04-01\",\n  \"cost\": 900,\n  \"description\": \"Scheduled maintenance\",\n  \"serviceProvider\": \"Auto Service Timisoara\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('maintenanceRecordId', json.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Maintenance Records by Vehicle",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/vehicles/{{vehicleId}}/maintenance-records?page=0&size=10"
+              }
+            },
+            {
+              "name": "Get Maintenance Record",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/maintenance-records/{{maintenanceRecordId}}"
+              }
+            },
+            {
+              "name": "Update Maintenance Record",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/fleet/maintenance-records/{{maintenanceRecordId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"mileage\": 25000,\n  \"serviceDate\": \"2026-04-01\",\n  \"cost\": 900,\n  \"description\": \"Scheduled maintenance\",\n  \"serviceProvider\": \"Auto Service Timisoara\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Delete Maintenance Record",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/fleet/maintenance-records/{{maintenanceRecordId}}"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Parcel Service",
+      "item": [
+        {
+          "name": "Parcels",
+          "item": [
+            {
+              "name": "Create Parcel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"depotCode\": \"{{depotCode}}\",\n  \"senderContact\": {\n    \"name\": \"Sender Example\",\n    \"email\": \"sender@example.com\",\n    \"phone\": \"+40740000004\",\n    \"address\": {\n      \"cityId\": \"{{localityId}}\",\n      \"street\": \"Strada Alba Iulia\",\n      \"number\": \"5\"\n    }\n  },\n  \"receiverContact\": {\n    \"name\": \"Receiver Example\",\n    \"email\": \"receiver@example.com\",\n    \"phone\": \"+40740000005\",\n    \"address\": {\n      \"cityId\": \"{{localityId}}\",\n      \"street\": \"Piata Victoriei\",\n      \"number\": \"1\"\n    }\n  },\n  \"weight\": 3.5,\n  \"volume\": 0.2,\n  \"paymentRequired\": false,\n  \"paymentAmount\": null,\n  \"declaredValue\": 250,\n  \"observations\": \"Routing flow test parcel\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('parcelId', json.id);",
+                      "if (json.awb) pm.collectionVariables.set('awb', json.awb);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Parcel",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}"
+              }
+            },
+            {
+              "name": "Get Parcel by AWB",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/parcels/awb/{{awb}}"
+              }
+            },
+            {
+              "name": "Get Parcel PIN by AWB",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/parcels/awb/{{awb}}/pin"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.pin) pm.collectionVariables.set('deliveryPin', json.pin);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Verify Delivery Code",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/verify-delivery-code",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"awb\": \"{{awb}}\",\n  \"pin\": \"{{deliveryPin}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Search Parcels",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/parcels?depotCode={{depotCode}}&awb=&status=WAITING_IN_DEPOT&page=0&size=20&sortBy=createdAt&sortDirection=DESC"
+              }
+            },
+            {
+              "name": "Update Parcel",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"depotCode\": \"{{depotCode}}\",\n  \"senderContact\": {\n    \"name\": \"Sender Example\",\n    \"email\": \"sender@example.com\",\n    \"phone\": \"+40740000004\",\n    \"address\": {\n      \"cityId\": \"{{localityId}}\",\n      \"street\": \"Strada Alba Iulia\",\n      \"number\": \"5\"\n    }\n  },\n  \"receiverContact\": {\n    \"name\": \"Receiver Example\",\n    \"email\": \"receiver@example.com\",\n    \"phone\": \"+40740000005\",\n    \"address\": {\n      \"cityId\": \"{{localityId}}\",\n      \"street\": \"Piata Victoriei\",\n      \"number\": \"1\"\n    }\n  },\n  \"weight\": 3.5,\n  \"volume\": 0.2,\n  \"paymentRequired\": false,\n  \"paymentAmount\": null,\n  \"declaredValue\": 250,\n  \"observations\": \"Routing flow test parcel\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Get Parcel History",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/history?page=0&size=50"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lifecycle",
+          "item": [
+            {
+              "name": "Cancel Parcel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/cancel",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Customer requested cancellation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Mark Out for Delivery",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/out-for-delivery"
+              }
+            },
+            {
+              "name": "Mark Delivered",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/delivered",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"completedAt\": \"2026-04-28T12:00:00Z\",\n  \"codeVerified\": true,\n  \"notes\": \"Delivered to recipient\",\n  \"paymentCollected\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Mark Failed",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/failed",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"failedAt\": \"2026-04-28T12:00:00Z\",\n  \"reason\": \"Recipient unavailable\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Mark Rejected",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/rejected",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rejectedAt\": \"2026-04-28T12:00:00Z\",\n  \"reason\": \"Recipient rejected parcel\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Mark Waiting Pickup",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/waiting-pickup",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"markedAt\": \"2026-04-28T08:00:00Z\",\n  \"reason\": \"Parcel available in receiver depot for route planning\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Mark Returned",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/parcels/{{parcelId}}/returned",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"returnedAt\": \"2026-04-28T12:00:00Z\",\n  \"reason\": \"Returned to sender\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Internal Routing Support",
+          "item": [
+            {
+              "name": "List Routable Parcels",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/parcels/internal/routable?depotCode={{depotCode}}&limit=500",
+                "description": "Called by routing-service before VROOM optimization."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Routing Service",
+      "item": [
+        {
+          "name": "Routing Jobs",
+          "item": [
+            {
+              "name": "Create Routing Job",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/routing/routing-jobs/create",
+                "description": "Loads depot and vehicles from fleet-service, couriers from user-service, routable parcels from parcel-service, enriches coordinates through geography-service, then calls VROOM.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"depotId\": \"{{depotId}}\",\n  \"routeDate\": \"{{routeDate}}\",\n  \"routeType\": \"REGIONAL_TO_RECEIVER\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('routingJobId', json.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Select Routing Job",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/api/routing/routing-jobs/{{routingJobId}}/select",
+                "description": "Publishes planned routes to delivery-execution-service as delivery runs."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Delivery Execution Service",
+      "item": [
+        {
+          "name": "Delivery Runs",
+          "item": [
+            {
+              "name": "Create Delivery Run",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/delivery-execution/runs",
+                "description": "Normally called by routing-service when selecting a routing job.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"routeId\": \"{{routeId}}\",\n  \"courierId\": \"{{courierProfileId}}\",\n  \"vehicleId\": \"{{vehicleId}}\",\n  \"routeDate\": \"{{routeDate}}\",\n  \"googleMapsUrl\": \"https://www.google.com/maps/dir/45.7489,21.2087/45.7537,21.2257/45.7489,21.2087\",\n  \"totalParcelCount\": 1,\n  \"totalWeight\": 4,\n  \"totalVolume\": 1,\n  \"stops\": [\n    {\n      \"routeStopId\": \"{{routeStopId}}\",\n      \"stopOrder\": 1,\n      \"latitude\": 45.7537,\n      \"longitude\": 21.2257,\n      \"parcelCount\": 1,\n      \"totalWeight\": 4,\n      \"totalVolume\": 1,\n      \"parcels\": [\n        {\n          \"parcelId\": \"{{parcelId}}\",\n          \"awb\": \"{{awb}}\",\n          \"receiverName\": \"Receiver Example\",\n          \"receiverPhone\": \"+40740000005\",\n          \"weight\": 4,\n          \"volume\": 1\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('deliveryRunId', json.id);",
+                      "if (json.routeId) pm.collectionVariables.set('routeId', json.routeId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Runs by Courier and Date",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs?courierId={{courierProfileId}}&routeDate={{routeDate}}&status=NOT_STARTED"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const items = Array.isArray(json) ? json : (json.content || []);",
+                      "if (items.length > 0) {",
+                      "  pm.collectionVariables.set('deliveryRunId', items[0].id);",
+                      "  if (items[0].routeId) pm.collectionVariables.set('routeId', items[0].routeId);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Start Delivery Run",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/start"
+              }
+            },
+            {
+              "name": "Abort Delivery Run",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/abort"
+              }
+            },
+            {
+              "name": "Complete Delivery Run",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/complete"
+              }
+            },
+            {
+              "name": "Get Delivery Run by Route",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/by-route/{{routeId}}"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('deliveryRunId', json.id);",
+                      "if (json.routeId) pm.collectionVariables.set('routeId', json.routeId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Delivery Run Details",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('deliveryRunId', json.id);",
+                      "if (json.routeId) pm.collectionVariables.set('routeId', json.routeId);",
+                      "const stop = json.currentStop || (json.stops && json.stops[0]);",
+                      "if (stop) {",
+                      "  pm.collectionVariables.set('deliveryStopExecutionId', stop.id);",
+                      "  if (stop.parcels && stop.parcels[0]) {",
+                      "    pm.collectionVariables.set('deliveryParcelExecutionId', stop.parcels[0].id);",
+                      "    if (stop.parcels[0].awb) pm.collectionVariables.set('awb', stop.parcels[0].awb);",
+                      "    if (stop.parcels[0].parcelId) pm.collectionVariables.set('parcelId', stop.parcels[0].parcelId);",
+                      "  }",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Delivery Run",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stops and Proof",
+          "item": [
+            {
+              "name": "Arrive at Stop",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/stops/{{deliveryStopExecutionId}}/arrive"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json.id) pm.collectionVariables.set('deliveryRunId', json.id);",
+                      "if (json.routeId) pm.collectionVariables.set('routeId', json.routeId);",
+                      "const stop = json.currentStop || (json.stops && json.stops[0]);",
+                      "if (stop) {",
+                      "  pm.collectionVariables.set('deliveryStopExecutionId', stop.id);",
+                      "  if (stop.parcels && stop.parcels[0]) {",
+                      "    pm.collectionVariables.set('deliveryParcelExecutionId', stop.parcels[0].id);",
+                      "    if (stop.parcels[0].awb) pm.collectionVariables.set('awb', stop.parcels[0].awb);",
+                      "    if (stop.parcels[0].parcelId) pm.collectionVariables.set('parcelId', stop.parcels[0].parcelId);",
+                      "  }",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Verify Delivery Code for Stop Parcel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/stops/{{deliveryStopExecutionId}}/parcels/verify-code",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"awb\": \"{{awb}}\",\n  \"pin\": \"{{deliveryPin}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Parcels and Scans",
+          "item": [
+            {
+              "name": "List Delivery Parcels by Run",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/parcels?page=0&size=20"
+              }
+            },
+            {
+              "name": "Scan Delivery Parcel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/parcels/{{deliveryParcelExecutionId}}/scan",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"scanType\": \"LOADED_FOR_DELIVERY\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Complete Delivery Parcel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/parcels/{{deliveryParcelExecutionId}}/complete",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"outcome\": \"DELIVERED\",\n  \"notes\": \"Delivered to recipient\",\n  \"paymentCollected\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "List Parcel Scan Events",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/delivery-execution/parcels/{{parcelId}}/scan-events?page=0&size=20"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gateway and Discovery",
+      "item": [
+        {
+          "name": "API Gateway Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/"
+          }
+        },
+        {
+          "name": "Eureka Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{discoveryUrl}}/"
+          }
+        }
+      ],
+      "description": "Infrastructure endpoints useful while checking service registration. Notification service has Kafka consumers only and no business HTTP controller in this codebase."
+    },
+    {
+      "name": "End-to-End Flow - Routing to Delivery",
+      "item": [
+        {
+          "name": "01 Login as Admin or Dispatcher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@autopulse.local\",\n  \"password\": \"Admin1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('refreshToken', json.refreshToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 Create Region",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/geography/admin/regions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Timis\",\n  \"code\": \"{{regionCode}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('regionId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 Create Locality",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/geography/admin/localities",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Timisoara\",\n  \"code\": \"TM-TSR\",\n  \"regionId\": \"{{regionId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('localityId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 Create Depot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/fleet/depots",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Timisoara Depot\",\n  \"addressStreet\": \"Calea Sagului\",\n  \"addressNumber\": \"12\",\n  \"localityId\": \"{{localityId}}\",\n  \"localityCode\": \"TM-TSR\",\n  \"contactName\": \"Depot Manager\",\n  \"contactPhone\": \"+40740000001\",\n  \"contactEmail\": \"depot.timisoara@autopulse.local\",\n  \"depotCode\": \"{{depotCode}}\",\n  \"latitude\": 45.7489,\n  \"longitude\": 21.2087\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('depotId', json.id);",
+                  "if (json.depotCode) pm.collectionVariables.set('depotCode', json.depotCode);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 Create Available Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/fleet/vehicles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"depotId\": \"{{depotId}}\",\n  \"licensePlate\": \"TM01APL\",\n  \"brand\": \"Ford\",\n  \"model\": \"Transit\",\n  \"vin\": \"WF0XXXTTGXPK00001\",\n  \"year\": 2024,\n  \"category\": \"M1\",\n  \"fuelType\": \"DIESEL\",\n  \"capacityWeight\": 1200,\n  \"capacityVolume\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('vehicleId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 Create Available Courier",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users/admin/couriers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"courier.timisoara@autopulse.local\",\n  \"firstName\": \"Cristian\",\n  \"lastName\": \"Courier\",\n  \"phoneNumber\": \"+40740000003\",\n  \"depotId\": \"{{depotId}}\",\n  \"regionCode\": \"{{regionCode}}\",\n  \"availabilityStatus\": \"AVAILABLE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.courierProfileId) pm.collectionVariables.set('courierProfileId', json.courierProfileId);",
+                  "if (json.user && json.user.id) pm.collectionVariables.set('userId', json.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 Create Parcel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parcels",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"depotCode\": \"{{depotCode}}\",\n  \"senderContact\": {\n    \"name\": \"Sender Example\",\n    \"email\": \"sender@example.com\",\n    \"phone\": \"+40740000004\",\n    \"address\": {\n      \"cityId\": \"{{localityId}}\",\n      \"street\": \"Strada Alba Iulia\",\n      \"number\": \"5\"\n    }\n  },\n  \"receiverContact\": {\n    \"name\": \"Receiver Example\",\n    \"email\": \"receiver@example.com\",\n    \"phone\": \"+40740000005\",\n    \"address\": {\n      \"cityId\": \"{{localityId}}\",\n      \"street\": \"Piata Victoriei\",\n      \"number\": \"1\"\n    }\n  },\n  \"weight\": 3.5,\n  \"volume\": 0.2,\n  \"paymentRequired\": false,\n  \"paymentAmount\": null,\n  \"declaredValue\": 250,\n  \"observations\": \"Routing flow test parcel\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('parcelId', json.id);",
+                  "if (json.awb) pm.collectionVariables.set('awb', json.awb);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 Make Parcel Routable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parcels/{{parcelId}}/waiting-pickup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"markedAt\": \"2026-04-28T08:00:00Z\",\n  \"reason\": \"Parcel available in receiver depot for route planning\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "09 Check Routable Parcels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/parcels/internal/routable?depotCode={{depotCode}}&limit=500"
+          }
+        },
+        {
+          "name": "10 Create Routing Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/routing/routing-jobs/create",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"depotId\": \"{{depotId}}\",\n  \"routeDate\": \"{{routeDate}}\",\n  \"routeType\": \"REGIONAL_TO_RECEIVER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('routingJobId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 Select Routing Job and Publish Delivery Runs",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/routing/routing-jobs/{{routingJobId}}/select"
+          }
+        },
+        {
+          "name": "12 Find Delivery Run by Courier and Date",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/delivery-execution/runs?courierId={{courierProfileId}}&routeDate={{routeDate}}&status=NOT_STARTED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const items = Array.isArray(json) ? json : (json.content || []);",
+                  "if (items.length > 0) {",
+                  "  pm.collectionVariables.set('deliveryRunId', items[0].id);",
+                  "  if (items[0].routeId) pm.collectionVariables.set('routeId', items[0].routeId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 Start Delivery Run",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/start"
+          }
+        },
+        {
+          "name": "14 Get Delivery Run Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('deliveryRunId', json.id);",
+                  "if (json.routeId) pm.collectionVariables.set('routeId', json.routeId);",
+                  "const stop = json.currentStop || (json.stops && json.stops[0]);",
+                  "if (stop) {",
+                  "  pm.collectionVariables.set('deliveryStopExecutionId', stop.id);",
+                  "  if (stop.parcels && stop.parcels[0]) {",
+                  "    pm.collectionVariables.set('deliveryParcelExecutionId', stop.parcels[0].id);",
+                  "    if (stop.parcels[0].awb) pm.collectionVariables.set('awb', stop.parcels[0].awb);",
+                  "    if (stop.parcels[0].parcelId) pm.collectionVariables.set('parcelId', stop.parcels[0].parcelId);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 Arrive at Current Stop",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/stops/{{deliveryStopExecutionId}}/arrive"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('deliveryRunId', json.id);",
+                  "if (json.routeId) pm.collectionVariables.set('routeId', json.routeId);",
+                  "const stop = json.currentStop || (json.stops && json.stops[0]);",
+                  "if (stop) {",
+                  "  pm.collectionVariables.set('deliveryStopExecutionId', stop.id);",
+                  "  if (stop.parcels && stop.parcels[0]) {",
+                  "    pm.collectionVariables.set('deliveryParcelExecutionId', stop.parcels[0].id);",
+                  "    if (stop.parcels[0].awb) pm.collectionVariables.set('awb', stop.parcels[0].awb);",
+                  "    if (stop.parcels[0].parcelId) pm.collectionVariables.set('parcelId', stop.parcels[0].parcelId);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "16 Get Parcel PIN for Test Flow",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/parcels/awb/{{awb}}/pin"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.pin) pm.collectionVariables.set('deliveryPin', json.pin);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "17 Verify Delivery Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/stops/{{deliveryStopExecutionId}}/parcels/verify-code",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"awb\": \"{{awb}}\",\n  \"pin\": \"{{deliveryPin}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "18 Complete Parcel as Delivered",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/parcels/{{deliveryParcelExecutionId}}/complete",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outcome\": \"DELIVERED\",\n  \"notes\": \"Delivered to recipient\",\n  \"paymentCollected\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "19 Complete Delivery Run",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/delivery-execution/runs/{{deliveryRunId}}/complete"
+          }
+        }
+      ],
+      "description": "External calls to execute the full happy path. Routing and delivery make additional internal calls listed in the final notes."
+    }
+  ]
+}

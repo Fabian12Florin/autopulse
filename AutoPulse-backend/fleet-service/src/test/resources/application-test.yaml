@@ -1,0 +1,20 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: gateway-service
+  main:
+    web-application-type: reactive
+  security:
+    enabled: false
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: false
+    fetch-registry: false
+  instance:
+    prefer-ip-address: false
+    hostname: localhost

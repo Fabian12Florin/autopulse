@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: osrm
+  namespace: autopulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: osrm
+  template:
+    metadata:
+      labels:
+        app: osrm
+    spec:
+      containers:
+        - name: osrm
+          image: crautopulsedev.azurecr.io/autopulse-osrm:1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: osrm
+  namespace: autopulse
+spec:
+  selector:
+    app: osrm
+  ports:
+    - port: 5000
+      targetPort: 5000

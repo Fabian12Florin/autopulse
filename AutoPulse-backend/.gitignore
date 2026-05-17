@@ -1,0 +1,68 @@
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+
+# Maven build output
+target/
+**/target/
+
+# Maven temporary files
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+.mvn/
+mvnw
+mvnw.cmd
+!.mvn/wrapper/maven-wrapper.jar
+
+infra/osrm/osrm-data/
+
+# Logs
+*.log
+logs/
+**/logs/
+
+!.env.example
+!**/.env.example
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Build folders
+build/
+dist/
+**/build/
+**/dist/
+
+# Local tooling/cache
+.claude/
+
+# OSRM and VROOM data files
+/infra/osrm/osrm-data/*
+/infra/osrm/osrm-aks-image/osrm-data/*
+/routing-service/src/main/java/com/autopulse/routingservice/temp/vroom/
+
+k8s/01-secrets.yaml
+k8s/02-configmap.yaml
+logs.txt
+k8s-aks/01-secrets.yaml
+k8s-aks/02-configmap.yaml

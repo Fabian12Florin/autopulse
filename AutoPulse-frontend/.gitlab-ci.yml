@@ -1,0 +1,67 @@
+default:
+  tags:
+    - docker
+
+stages:
+  - test
+  - build
+  - push
+
+variables:
+  IMAGE_VERSION: "1.2"
+  ACR_REGISTRY: "crautopulsedev.azurecr.io"
+  IMAGE_NAME: "autopulse-frontend"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+frontend-build:
+  stage: test
+  image: node:20-alpine
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    when: always
+    paths:
+      - dist/
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+build-frontend-image:
+  stage: build
+  image: docker:24
+  variables:
+    DOCKER_HOST: "unix:///var/run/docker.sock"
+  before_script:
+    - docker info
+  script:
+    - docker build -f Dockerfile -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
+    - docker images | grep $IMAGE_NAME
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+push-frontend-acr:
+  stage: push
+  image: docker:24
+  variables:
+    DOCKER_HOST: "unix:///var/run/docker.sock"
+  before_script:
+    - docker info
+    - echo "$ACR_PASSWORD" | docker login $ACR_REGISTRY -u "$ACR_USERNAME" --password-stdin
+  script:
+    - docker build -f Dockerfile -t $ACR_REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
+    - docker push $ACR_REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "dev" ] || [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        docker tag $ACR_REGISTRY/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA $ACR_REGISTRY/$IMAGE_NAME:$IMAGE_VERSION
+        docker push $ACR_REGISTRY/$IMAGE_NAME:$IMAGE_VERSION
+      fi
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

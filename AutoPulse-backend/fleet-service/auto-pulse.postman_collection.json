@@ -1,0 +1,691 @@
+{
+  "info": {
+    "_postman_id": "e30caef8-b761-4998-bac3-20fab0473b85",
+    "name": "auto-pulse",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50374176",
+    "_collection_link": "https://go.postman.co/collection/50374176-e30caef8-b761-4998-bac3-20fab0473b85?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Depot",
+      "item": [
+        {
+          "name": "post depot",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Depot Bucuresti Nord\",\r\n  \"addressStreet\": \"Strada Fabricii\",\r\n  \"addressNumber\": \"12A\",\r\n  \"localityId\": \"11111111-1111-1111-1111-111111111111\",\r\n  \"localityCode\": \"B-01\",\r\n  \"contactName\": \"Ion Popescu\",\r\n  \"contactPhone\": \"0722000000\",\r\n  \"contactEmail\": \"depot.bucuresti@autopulse.ro\",\r\n  \"depotCode\": \"DEPOT-BUC-NORD\",\r\n  \"latitude\": 44.439663,\r\n  \"longitude\": 26.096306\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/fleet/depots",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fleet",
+                "depots"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all depots",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get depot by id",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "update depot",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "patch deactivate",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/v1/depots/1/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "depots",
+                "1",
+                "deactivate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "activate depo",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/v1/depots/1/activate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "depots",
+                "1",
+                "activate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get depot coordinates by locality",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/fleet/depots/{{depotId}}/coordinates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fleet",
+                "depots",
+                "{{depotId}}",
+                "coordinates"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "vehicle",
+      "item": [
+        {
+          "name": "create vehicle",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"depotId\": 1,\r\n  \"licensePlate\": \"CJ99AUTO\",\r\n  \"brand\": \"Ford\",\r\n  \"model\": \"Transit\",\r\n  \"vin\": \"WF0XXXTTGX1234567\",\r\n  \"year\": 2022,\r\n  \"category\": \"M2\",\r\n  \"fuelType\": \"DIESEL\",\r\n  \"capacityWeight\": 1200,\r\n  \"capacityVolume\": 10,\r\n  \"status\": \"AVAILABLE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicles",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all vehicles",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get vehicle by id",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "update vehicle by id",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"depotId\": 1,\r\n  \"licensePlate\": \"CJ99AUTO\",\r\n  \"brand\": \"Ford\",\r\n  \"model\": \"Transit Custom\",\r\n  \"vin\": \"WF0XXXTTGX1234567\",\r\n  \"year\": 2023,\r\n  \"category\": \"M2\",\r\n  \"fuelType\": \"DIESEL\",\r\n  \"capacityWeight\": 1300,\r\n  \"capacityVolume\": 11,\r\n  \"status\": \"AVAILABLE\",\r\n  \"active\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicles/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicles",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "patch status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"AVAILABLE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicles/1/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicles",
+                "1",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deactivate",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicles/1/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicles",
+                "1",
+                "deactivate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "patch activate",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicles/1/activate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicles",
+                "1",
+                "activate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get available by depot",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get available vehicle summary by depot",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/fleet/vehicles/depots/40a7a0cd-b323-498d-b3c8-f6440e258f28/available-vehicles?page=0&size=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fleet",
+                "vehicles",
+                "depots",
+                "40a7a0cd-b323-498d-b3c8-f6440e258f28",
+                "available-vehicles"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "documents",
+      "item": [
+        {
+          "name": "create document",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"documentType\": \"INSURANCE\",\r\n  \"issuedAt\": \"2026-01-01\",\r\n  \"expiresAt\": \"2027-01-01\",\r\n  \"cost\": 120,\r\n  \"description\": \"RCA anual\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicles/1/documents",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicles",
+                "1",
+                "documents"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get document by vehicle",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get document by id",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "update document",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"documentType\": \"INSURANCE\",\r\n  \"issuedAt\": \"2026-01-01\",\r\n  \"expiresAt\": \"2027-06-01\",\r\n  \"cost\": 1300,\r\n  \"description\": \"RCA actualizat\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/documents/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "documents",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get expired documents",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "delete document",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/v1/documents/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "documents",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "vehicle maintenance",
+      "item": [
+        {
+          "name": "create maintenance",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"mileage\": 83000,\r\n  \"serviceDate\": \"2026-04-01\",\r\n  \"cost\": 900,\r\n  \"description\": \"Schimb ulei si filtre\",\r\n  \"serviceProvider\": \"Auto Service SRL\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicles/1/maintenance-records",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicles",
+                "1",
+                "maintenance-records"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get maintenance by vehicle",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get maintenance by id",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "update maintenance",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"mileage\": 83500,\r\n  \"serviceDate\": \"2026-04-02\",\r\n  \"cost\": 1000,\r\n  \"description\": \"Schimb ulei, filtre si verificare frane\",\r\n  \"serviceProvider\": \"Auto Service Plus\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/maintenance-records/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "maintenance-records",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete maintenance",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/v1/maintenance-records/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "maintenance-records",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "vehicle assignment",
+      "item": [
+        {
+          "name": "create assignment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"vehicleId\": 1,\r\n  \"courierId\": \"11111111-1111-1111-1111-111111111111\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicle-assignments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicle-assignments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all assignements",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get assignment by id",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get assignment by courier",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "get all asignments by courier",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "end assignment",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"vehicleId\": 1,\r\n  \"courierId\": \"11111111-1111-1111-1111-111111111111\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/vehicle-assignments/1/end",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "vehicle-assignments",
+                "1",
+                "end"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "courierId",
+      "value": ""
+    },
+    {
+      "key": "depotId",
+      "value": ""
+    }
+  ]
+}
