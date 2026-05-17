@@ -1,25 +1,25 @@
-# AutoPulse - Refactorizare Monolit -> Microservicii (Cloud Native Intro)
+# AutoPulse - Monolith to Microservices Refactor (Cloud Native Intro)
 
-## 1. Scopul temei
+## 1. Assignment Goal
 
-Cerinta laboratorului este:
+The lab requirement is:
 
-- pornim de la un model de aplicatie monolitica
-- separam cel putin 2 bounded contexts in servicii independente
-- demonstram deploy independent
-- documentam strategia si trade-offs
+- start from a monolithic application model
+- split at least 2 bounded contexts into independent services
+- demonstrate independent deployment
+- document the strategy and trade-offs
 
-Acest repository contine deja implementarea microservicii. In aceasta documentatie, proiectul este prezentat explicit ca rezultat al refactorizarii dintr-un monolit conceptual.
+This repository already contains a microservices implementation. In this documentation, the project is presented explicitly as the outcome of a refactor from a conceptual monolith.
 
-## 2. Overview proiect
+## 2. Project Overview
 
 - Frontend: `AutoPulse-frontend` (React + TypeScript)
 - Backend: `AutoPulse-backend` (Spring Boot, multi-module)
-- Domeniu: operatiuni de livrare colete (utilizatori, flota, colete, rutare, executie livrare, geografie, notificari)
+- Domain: parcel delivery operations (users, fleet, parcels, routing, delivery execution, geography, notifications)
 
-## 3. Structura monolitului (inainte de refactorizare)
+## 3. Monolith Structure (Before Refactoring)
 
-In varianta monolitica, sistemul ar fi fost un singur deployable (un singur proces) cu module interne:
+In a monolithic version, the system would have been a single deployable (single process) with internal modules:
 
 - `users-auth`
 - `parcels`
@@ -29,16 +29,16 @@ In varianta monolitica, sistemul ar fi fost un singur deployable (un singur proc
 - `geography`
 - `notifications`
 
-Caracteristici tipice monolit:
+Typical monolith characteristics:
 
-- un artifact de build
-- release unic
-- apeluri in-process intre module
-- risc de coupled changes
+- one build artifact
+- one release unit
+- in-process calls between modules
+- risk of coupled changes
 
-## 4. Microservicii identificate in proiect
+## 4. Existing Microservices in This Project
 
-Servicii backend existente:
+Current backend services:
 
 - `discovery-service`
 - `api-gateway`
@@ -50,7 +50,7 @@ Servicii backend existente:
 - `geography-service`
 - `notification-service`
 
-Componente suport:
+Supporting components:
 
 - Keycloak (identity provider)
 - Kafka (event streaming)
@@ -58,25 +58,25 @@ Componente suport:
 - Prometheus + Grafana
 - VROOM + OSRM (routing engine)
 
-## 5. Bounded Contexts (cerinta minima: cel putin 2)
+## 5. Bounded Contexts (Minimum Requirement: At Least 2)
 
 ### Context 1: User & Identity -> `user-service`
 
-Responsabilitati:
+Responsibilities:
 
-- utilizatori, curieri, dispatcheri
-- roluri si profile operationale
-- integrare auth cu Keycloak
+- users, couriers, dispatchers
+- roles and operational profiles
+- auth integration with Keycloak
 
 ### Context 2: Parcel Lifecycle -> `parcel-service`
 
-Responsabilitati:
+Responsibilities:
 
-- creare colet
-- actualizare status lifecycle
-- date necesare pentru rutare si executie livrare
+- parcel creation
+- parcel lifecycle status updates
+- data required for routing and delivery execution
 
-Contexturi suplimentare separate:
+Additional separated contexts:
 
 - Fleet -> `fleet-service`
 - Routing -> `routing-service`
@@ -84,27 +84,27 @@ Contexturi suplimentare separate:
 - Geography -> `geography-service`
 - Notifications -> `notification-service`
 
-## 6. Cum a fost facuta decompozitia (monolit -> microservicii)
+## 6. How the Decomposition Was Done (Monolith -> Microservices)
 
-Strategia aplicata:
+Applied strategy:
 
-1. delimitare pe business capabilities (nu pe layere tehnice)
-2. separare ownership model + API + persistenta pe context
-3. inlocuire apeluri in-process cu apeluri HTTP / evenimente
-4. introducere infrastructura cloud-native (discovery, gateway, observability)
+1. split by business capabilities (not by technical layers)
+2. separate ownership of model + API + persistence by context
+3. replace in-process calls with HTTP/event communication
+4. introduce cloud-native infrastructure (discovery, gateway, observability)
 
-Detaliere: [docs/decomposition-strategy.md](D:\autopulse-both\docs\decomposition-strategy.md)
+Details: [docs/decomposition-strategy.md](D:\autopulse-both\docs\decomposition-strategy.md)
 
-## 7. Dovada de deployment independent
+## 7. Evidence of Independent Deployment
 
-Pentru fiecare serviciu de business exista:
+For each business service there is:
 
-- build separat (`<service>/pom.xml`)
-- config separat (`application.yml|yaml|properties`)
-- imagine/container separat (`<service>/Dockerfile`)
-- port separat (`server.port` + variabile env)
+- separate build (`<service>/pom.xml`)
+- separate config (`application.yml|yaml|properties`)
+- separate container image (`<service>/Dockerfile`)
+- separate port (`server.port` + env vars)
 
-Exemple de build/deploy per serviciu:
+Example build/deploy commands per service:
 
 ```bash
 cd AutoPulse-backend
@@ -112,20 +112,20 @@ mvn -pl user-service -am clean package
 mvn -pl parcel-service -am clean package
 ```
 
-Detalii arhitectura si matrice de independenta: [docs/architecture.md](D:\autopulse-both\docs\architecture.md)
+Architecture details and independence matrix: [docs/architecture.md](D:\autopulse-both\docs\architecture.md)
 
-## 8. Verificare config/port/build/database
+## 8. Config/Port/Build/Database Verification
 
-- Config separat: prezent in fiecare serviciu
-- Port separat: prezent in fiecare serviciu
-- Build separat: prezent in fiecare serviciu
-- Izolare date:
-  - script SQL pentru DB-uri separate: `AutoPulse-backend/infra/postgres/sql/01-create-microservice-database.sql`
-  - DB-uri dedicate: `user_db`, `parcel_db`, `fleet_db`, `routing_db`, `delivery_db`, `geography_db`, `notification_db`, `keycloak_db`
+- Separate config: present in each service
+- Separate port: present in each service
+- Separate build: present in each service
+- Data isolation:
+  - SQL script for separate databases: `AutoPulse-backend/infra/postgres/sql/01-create-microservice-database.sql`
+  - Dedicated DBs: `user_db`, `parcel_db`, `fleet_db`, `routing_db`, `delivery_db`, `geography_db`, `notification_db`, `keycloak_db`
 
-## 9. Rulare locala
+## 9. Local Run
 
-### 9.1 Rulare backend complet (compose)
+### 9.1 Run Full Backend (Compose)
 
 ```bash
 cd AutoPulse-backend
@@ -140,7 +140,7 @@ cd ../../
 docker compose up -d --build
 ```
 
-### 9.2 Rulare frontend
+### 9.2 Run Frontend
 
 ```bash
 cd AutoPulse-frontend
@@ -151,41 +151,25 @@ npm run dev
 - Frontend: `http://localhost:5173`
 - Gateway: `http://localhost:8080`
 
-### 9.3 Rulare individuala serviciu (exemplu)
+### 9.3 Run a Single Service (Example)
 
 ```bash
 cd AutoPulse-backend
 mvn -pl parcel-service -am spring-boot:run
 ```
 
-## 10. Trade-offs (rezumat)
+## 10. Trade-offs (Summary)
 
-Avantaje:
+Benefits:
 
-- deploy independent per bounded context
-- scalare independenta
-- fault isolation mai buna
+- independent deployment per bounded context
+- independent scaling
+- better fault isolation
 
-Costuri:
+Costs:
 
-- complexitate operationala mai mare
-- consistenta distribuita mai dificila
-- mai multe variabile de configurare
+- higher operational complexity
+- harder distributed consistency
+- more configuration variables to manage
 
-Detaliere: [docs/trade-offs.md](D:\autopulse-both\docs\trade-offs.md)
-
-## 11. Schimbari minime aplicate in repository
-
-Pentru claritate academica si rulare locala:
-
-- actualizat `AutoPulse-backend/.env.example` pentru consistenta cu `docker-compose.yml`
-- adaugat provisioning `keycloak_db` si `keycloak_user` in scriptul Postgres
-- rescris documentatia in format evaluabil pentru cerinta de laborator
-
-## 12. Checklist de conformitate cu enuntul
-
-- Monolit explicat: DA
-- Cel putin 2 bounded contexts separate: DA (`user-service`, `parcel-service`)
-- Servicii independente deployable: DA
-- Strategie de decompozitie documentata: DA
-- Trade-offs documentate: DA
+Details: [docs/trade-offs.md](D:\autopulse-both\docs\trade-offs.md)
